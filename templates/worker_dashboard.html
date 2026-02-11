@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard - Labour Connect</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Color Palette */
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* ==================== DASHBOARD LAYOUT ==================== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==================== SIDEBAR STYLES ==================== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            padding: 0.875rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-light);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .menu-item i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 1rem 0;
+        }
+
+        /* ==================== MAIN CONTENT AREA ==================== */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ==================== TOP NAVBAR ==================== */
+        .top-navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .navbar-left h1 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            transition: color 0.2s;
+        }
+
+        .notification-icon:hover {
+            color: var(--primary-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .profile-mini {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        /* ==================== CONTENT SECTIONS ==================== */
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 1400px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* ==================== PROFILE SECTION ==================== */
+        .profile-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .profile-image-wrapper {
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-busy {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .profile-details {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-gray);
+        }
+
+        .detail-value {
+            color: var(--text-dark);
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: #eff6ff;
+            color: var(--primary-color);
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 0.625rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* ==================== FORM STYLES ==================== */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.938rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .file-upload-wrapper {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        /* ==================== NOTIFICATIONS ==================== */
+        .notification-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .notification-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .notification-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .notification-info h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-info p {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+
+        .notification-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+        }
+
+        .notification-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .notification-detail-item i {
+            color: var(--primary-color);
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* ==================== STATISTICS ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.2;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* ==================== HISTORY TABLE ==================== */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: var(--bg-light);
+        }
+
+        .history-table th {
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .history-table td {
+            padding: 1rem 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.813rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* ==================== RECENT ACTIVITY ==================== */
+        .activity-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .activity-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .activity-icon {
+            position: absolute;
+            left: -1.75rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-white);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .activity-content h4 {
+            font-size: 0.938rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-content p {
+            font-size: 0.813rem;
+            color: var(--text-gray);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-top: 0.25rem;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar {
+                padding: 1rem;
+            }
+
+            .content-wrapper {
+                padding: 1rem;
+            }
+
+            .notification-details {
+                grid-template-columns: 1fr;
+            }
+
+            .history-table {
+                font-size: 0.875rem;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 0.625rem 0.5rem;
+            }
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+
+        /* ==================== OVERLAY FOR MOBILE ==================== */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        
+        <!-- ==================== SIDEBAR ==================== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-hard-hat"></i>
+                    Labour Connect
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="menu-item" data-section="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="#" class="menu-item" data-section="history">
+                    <i class="fas fa-history"></i>
+                    <span>Work History</span>
+                </a>
+                <a href="#" class="menu-item" data-section="statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+                <a href="#" class="menu-item" data-section="activity">
+                    <i class="fas fa-clock"></i>
+                    <span>Recent Activity</span>
+                </a>
+
+                <div class="menu-divider"></div>
+
+                <a href="#" class="menu-item" data-section="update-profile">
+                    <i class="fas fa-edit"></i>
+                    <span>Update Profile</span>
+                </a>
+                <a href="#" class="menu-item" onclick="alert('Logout functionality will be handled by Django backend')">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <i class="fas fa-bars mobile-menu-toggle" id="menuToggle"></i>
+                    <h1>Worker Dashboard</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="notification-icon" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff" 
+                         alt="Profile" class="profile-mini">
+                </div>
+            </nav>
+
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+
+                <!-- ==================== PROFILE SECTION ==================== -->
+                <section id="profile" class="section active">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Worker Profile</h2>
+                            <button class="btn btn-primary" onclick="navigateToSection('update-profile')">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <div class="profile-image-wrapper">
+                                <!-- Django Template Variable: {{ worker.profile_photo.url }} -->
+                                <img src="https://ui-avatars.com/api/?name=John+Doe&size=150&background=2563eb&color=fff" 
+                                     alt="Profile Photo" class="profile-image">
+                                <!-- Django Template Variable: {{ worker.status }} -->
+                                <span class="status-badge status-available">Available</span>
+                            </div>
+
+                            <div class="profile-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Full Name:</span>
+                                    <!-- Django Template Variable: {{ worker.full_name }} -->
+                                    <span class="detail-value">John Doe</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Email:</span>
+                                    <!-- Django Template Variable: {{ worker.email }} -->
+                                    <span class="detail-value">john.doe@example.com</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Phone:</span>
+                                    <!-- Django Template Variable: {{ worker.phone }} -->
+                                    <span class="detail-value">+91 98765 43210</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Location:</span>
+                                    <!-- Django Template Variable: {{ worker.location }} -->
+                                    <span class="detail-value">Mumbai, Maharashtra</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Expertise:</span>
+                                    <div class="skills-tags">
+                                        <!-- Django Loop: {% for skill in worker.skills.all %} -->
+                                        <span class="skill-tag">Carpentry</span>
+                                        <span class="skill-tag">Plumbing</span>
+                                        <span class="skill-tag">Electrical Work</span>
+                                        <!-- {% endfor %} -->
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Member Since:</span>
+                                    <!-- Django Template Variable: {{ worker.created_at|date:"F Y" }} -->
+                                    <span class="detail-value">January 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== UPDATE PROFILE SECTION ==================== -->
+                <section id="update-profile" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Update Profile</h2>
+                        </div>
+                        
+                        <!-- Django Form: <form method="POST" action="{% url 'update_profile' %}" enctype="multipart/form-data"> -->
+                        <form id="updateProfileForm">
+                            <!-- Django CSRF: {% csrf_token %} -->
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="fullName">Full Name</label>
+                                <input type="text" id="fullName" name="full_name" class="form-input" 
+                                       value="John Doe" required>
+                                <!-- Django: value="{{ worker.full_name }}" -->
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" 
+                                       value="john.doe@example.com" required>
+                                <!-- Django: value="{{ worker.email }}" -->
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" 
+                                       value="+91 98765 43210" required>
+                                <!-- Django: value="{{ worker.phone }}" -->
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="location">Location</label>
+                                <input type="text" id="location" name="location" class="form-input" 
+                                       value="Mumbai, Maharashtra" required>
+                                <!-- Django: value="{{ worker.location }}" -->
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="expertise">Expertise / Skills</label>
+                                <input type="text" id="expertise" name="expertise" class="form-input" 
+                                       value="Carpentry, Plumbing, Electrical Work" 
+                                       placeholder="Separate skills with commas">
+                                <!-- Django: value="{{ worker.expertise }}" -->
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Profile Photo</label>
+                                <div class="file-upload-wrapper" onclick="document.getElementById('profilePhoto').click()">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                    <p style="margin-top: 0.5rem; color: var(--text-gray);">
+                                        Click to upload new profile photo
+                                    </p>
+                                    <input type="file" id="profilePhoto" name="profile_photo" accept="image/*">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-input" name="status">
+                                    <option value="available">Available for Work</option>
+                                    <option value="busy">Busy</option>
+                                </select>
+                                <!-- Django: value="{{ worker.status }}" -->
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateToSection('profile')">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ==================== NOTIFICATIONS SECTION ==================== -->
+                <section id="notifications" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Job Notifications</h2>
+                            <span style="color: var(--text-gray); font-size: 0.875rem;">
+                                You have 3 pending requests
+                            </span>
+                        </div>
+
+                        <div class="notification-list">
+                            <!-- Django Loop: {% for notification in notifications %} -->
+                            
+                            <!-- Notification Card 1 -->
+                            <div class="notification-card" data-notification-id="1">
+                                <div class="notification-header">
+                                    <div class="notification-info">
+                                        <h3>Plumbing Work Required</h3>
+                                        <!-- Django: {{ notification.client_name }} -->
+                                        <p><i class="fas fa-user"></i> Rajesh Kumar</p>
+                                    </div>
+                                </div>
+
+                                <div class="notification-details">
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-wrench"></i>
+                                        <!-- Django: {{ notification.work_type }} -->
+                                        <span>Kitchen Sink Repair</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <!-- Django: {{ notification.location }} -->
+                                        <span>Andheri West, Mumbai</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <!-- Django: {{ notification.date_time }} -->
+                                        <span>Feb 11, 2026 - 10:00 AM</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-actions">
+                                    <button class="btn btn-success" onclick="acceptJob(1)">
+                                        <i class="fas fa-check"></i> Accept
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rejectJob(1)">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Notification Card 2 -->
+                            <div class="notification-card" data-notification-id="2">
+                                <div class="notification-header">
+                                    <div class="notification-info">
+                                        <h3>Electrical Installation</h3>
+                                        <p><i class="fas fa-user"></i> Priya Sharma</p>
+                                    </div>
+                                </div>
+
+                                <div class="notification-details">
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-wrench"></i>
+                                        <span>New Wiring Installation</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Bandra East, Mumbai</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>Feb 12, 2026 - 2:00 PM</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-actions">
+                                    <button class="btn btn-success" onclick="acceptJob(2)">
+                                        <i class="fas fa-check"></i> Accept
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rejectJob(2)">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Notification Card 3 -->
+                            <div class="notification-card" data-notification-id="3">
+                                <div class="notification-header">
+                                    <div class="notification-info">
+                                        <h3>Carpentry Work</h3>
+                                        <p><i class="fas fa-user"></i> Amit Patel</p>
+                                    </div>
+                                </div>
+
+                                <div class="notification-details">
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-wrench"></i>
+                                        <span>Custom Wardrobe Installation</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Powai, Mumbai</span>
+                                    </div>
+                                    <div class="notification-detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>Feb 13, 2026 - 9:00 AM</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-actions">
+                                    <button class="btn btn-success" onclick="acceptJob(3)">
+                                        <i class="fas fa-check"></i> Accept
+                                    </button>
+                                    <button class="btn btn-danger" onclick="rejectJob(3)">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- {% endfor %} -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== WORK HISTORY SECTION ==================== -->
+                <section id="history" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Work History</h2>
+                        </div>
+
+                        <div style="overflow-x: auto;">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Job ID</th>
+                                        <th>Client Name</th>
+                                        <th>Work Type</th>
+                                        <th>Location</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Django Loop: {% for job in job_history %} -->
+                                    <tr>
+                                        <!-- Django: {{ job.id }} -->
+                                        <td>#JOB-1245</td>
+                                        <td>Suresh Menon</td>
+                                        <td>Plumbing Repair</td>
+                                        <td>Dadar, Mumbai</td>
+                                        <td>Feb 5, 2026</td>
+                                        <td><span class="status-tag status-completed">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#JOB-1232</td>
+                                        <td>Meena Iyer</td>
+                                        <td>Electrical Wiring</td>
+                                        <td>Worli, Mumbai</td>
+                                        <td>Feb 1, 2026</td>
+                                        <td><span class="status-tag status-completed">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#JOB-1220</td>
+                                        <td>Vikram Singh</td>
+                                        <td>Carpentry</td>
+                                        <td>Juhu, Mumbai</td>
+                                        <td>Jan 28, 2026</td>
+                                        <td><span class="status-tag status-cancelled">Cancelled</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#JOB-1215</td>
+                                        <td>Anjali Desai</td>
+                                        <td>Plumbing Installation</td>
+                                        <td>Malad, Mumbai</td>
+                                        <td>Jan 25, 2026</td>
+                                        <td><span class="status-tag status-completed">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>#JOB-1201</td>
+                                        <td>Rohit Bhatt</td>
+                                        <td>Electrical Repair</td>
+                                        <td>Borivali, Mumbai</td>
+                                        <td>Jan 20, 2026</td>
+                                        <td><span class="status-tag status-completed">Completed</span></td>
+                                    </tr>
+                                    <!-- {% endfor %} -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== STATISTICS SECTION ==================== -->
+                <section id="statistics" class="section">
+                    <h2 class="card-title mb-3">Work Statistics</h2>
+                    
+                    <div class="stats-grid">
+                        <!-- Total Jobs Completed -->
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle stat-icon"></i>
+                            <!-- Django: {{ total_jobs_completed }} -->
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Total Jobs Completed</div>
+                        </div>
+
+                        <!-- Active Jobs -->
+                        <div class="stat-card success">
+                            <i class="fas fa-briefcase stat-icon"></i>
+                            <!-- Django: {{ active_jobs }} -->
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Active Jobs</div>
+                        </div>
+
+                        <!-- Total Earnings -->
+                        <div class="stat-card warning">
+                            <i class="fas fa-wallet stat-icon"></i>
+                            <!-- Django: {{ total_earnings }} -->
+                            <div class="stat-value">₹84,500</div>
+                            <div class="stat-label">Total Earnings</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Stats Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Monthly Performance</h2>
+                        </div>
+
+                        <div style="padding: 2rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                                <div>
+                                    <p style="color: var(--text-gray); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        Jobs This Month
+                                    </p>
+                                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">
+                                        8
+                                    </p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-gray); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        Average Rating
+                                    </p>
+                                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--secondary-color);">
+                                        4.8 <i class="fas fa-star" style="font-size: 1rem;"></i>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-gray); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        Completion Rate
+                                    </p>
+                                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning-color);">
+                                        95%
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Simple Progress Bars -->
+                            <div style="margin-top: 2rem;">
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 0.875rem; font-weight: 500;">Plumbing Jobs</span>
+                                        <span style="font-size: 0.875rem; color: var(--text-gray);">60%</span>
+                                    </div>
+                                    <div style="height: 8px; background: var(--bg-light); border-radius: 10px; overflow: hidden;">
+                                        <div style="width: 60%; height: 100%; background: var(--primary-color);"></div>
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 0.875rem; font-weight: 500;">Electrical Jobs</span>
+                                        <span style="font-size: 0.875rem; color: var(--text-gray);">25%</span>
+                                    </div>
+                                    <div style="height: 8px; background: var(--bg-light); border-radius: 10px; overflow: hidden;">
+                                        <div style="width: 25%; height: 100%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 0.875rem; font-weight: 500;">Carpentry Jobs</span>
+                                        <span style="font-size: 0.875rem; color: var(--text-gray);">15%</span>
+                                    </div>
+                                    <div style="height: 8px; background: var(--bg-light); border-radius: 10px; overflow: hidden;">
+                                        <div style="width: 15%; height: 100%; background: var(--warning-color);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== RECENT ACTIVITY SECTION ==================== -->
+                <section id="activity" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                        </div>
+
+                        <div class="activity-timeline">
+                            <!-- Django Loop: {% for activity in recent_activities %} -->
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Completed Job #JOB-1245</h4>
+                                    <p>Successfully completed plumbing repair for Suresh Menon</p>
+                                    <div class="activity-time">
+                                        <i class="fas fa-clock"></i> 2 hours ago
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="border-color: var(--secondary-color); color: var(--secondary-color);">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Accepted New Job Request</h4>
+                                    <p>Accepted electrical wiring job from Priya Sharma</p>
+                                    <div class="activity-time">
+                                        <i class="fas fa-clock"></i> 5 hours ago
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="border-color: var(--warning-color); color: var(--warning-color);">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Profile Updated</h4>
+                                    <p>Updated skills and availability status</p>
+                                    <div class="activity-time">
+                                        <i class="fas fa-clock"></i> 1 day ago
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="border-color: var(--danger-color); color: var(--danger-color);">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>New Notification Received</h4>
+                                    <p>Carpentry work request from Amit Patel</p>
+                                    <div class="activity-time">
+                                        <i class="fas fa-clock"></i> 2 days ago
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>Completed Job #JOB-1232</h4>
+                                    <p>Successfully completed electrical wiring for Meena Iyer</p>
+                                    <div class="activity-time">
+                                        <i class="fas fa-clock"></i> 3 days ago
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- {% endfor %} -->
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ==================== NAVIGATION BETWEEN SECTIONS ====================
+        const menuItems = document.querySelectorAll('.menu-item');
+        const sections = document.querySelectorAll('.section');
+        
+        function navigateToSection(sectionId) {
+            // Remove active class from all menu items and sections
+            menuItems.forEach(item => item.classList.remove('active'));
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Add active class to selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+            
+            // Add active class to corresponding menu item
+            const selectedMenuItem = document.querySelector(`[data-section="${sectionId}"]`);
+            if (selectedMenuItem) {
+                selectedMenuItem.classList.add('active');
+            }
+
+            // Close mobile sidebar if open
+            closeMobileSidebar();
+        }
+
+        // Add click event to all menu items
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = item.getAttribute('data-section');
+                if (sectionId) {
+                    navigateToSection(sectionId);
+                }
+            });
+        });
+
+        // ==================== NOTIFICATION BELL CLICK ====================
+        document.getElementById('notificationBell').addEventListener('click', () => {
+            navigateToSection('notifications');
+        });
+
+        // ==================== JOB ACCEPT/REJECT FUNCTIONALITY ====================
+        function acceptJob(jobId) {
+            // In Django, this will send POST request to backend
+            // For now, we just update UI
+            const card = document.querySelector(`[data-notification-id="${jobId}"]`);
+            if (card) {
+                card.style.background = '#d1fae5';
+                card.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #065f46;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h3>Job Accepted!</h3>
+                        <p>You have successfully accepted this job request.</p>
+                    </div>
+                `;
+                
+                // Update notification badge
+                updateNotificationBadge(-1);
+                
+                // Show success message
+                showToast('Job accepted successfully!', 'success');
+            }
+        }
+
+        function rejectJob(jobId) {
+            // In Django, this will send POST request to backend
+            const card = document.querySelector(`[data-notification-id="${jobId}"]`);
+            if (card) {
+                card.style.background = '#fee2e2';
+                card.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #991b1b;">
+                        <i class="fas fa-times-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h3>Job Rejected</h3>
+                        <p>You have rejected this job request.</p>
+                    </div>
+                `;
+                
+                // Update notification badge
+                updateNotificationBadge(-1);
+                
+                // Show info message
+                showToast('Job rejected', 'info');
+            }
+        }
+
+        // ==================== UPDATE NOTIFICATION BADGE ====================
+        function updateNotificationBadge(change) {
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                let currentCount = parseInt(badge.textContent);
+                currentCount += change;
+                if (currentCount <= 0) {
+                    badge.style.display = 'none';
+                } else {
+                    badge.textContent = currentCount;
+                }
+            }
+        }
+
+        // ==================== TOAST NOTIFICATION ====================
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'info' ? '#2563eb' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== MOBILE SIDEBAR TOGGLE ====================
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', closeMobileSidebar);
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // ==================== FORM SUBMISSION (FRONTEND ONLY) ====================
+        document.getElementById('updateProfileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // In Django, this form will actually submit to backend
+            // For demo, just show success message
+            showToast('Profile updated successfully!', 'success');
+            
+            // Navigate back to profile after 1.5 seconds
+            setTimeout(() => {
+                navigateToSection('profile');
+            }, 1500);
+        });
+
+        // ==================== FILE UPLOAD PREVIEW ====================
+        document.getElementById('profilePhoto').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                showToast(`Selected: ${file.name}`, 'info');
+            }
+        });
+
+        // ==================== CSS ANIMATIONS ====================
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ==================== INITIALIZE ====================
+        console.log('Worker Dashboard initialized successfully!');
+        console.log('Note: Backend integration with Django required for full functionality');
+    </script>
+
+</body>
+</html>
