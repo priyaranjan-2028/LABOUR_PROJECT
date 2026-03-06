@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Login - LabourConnect Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% load static %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Premium Background Pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(20, 168, 168, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 168, 168, 0.1));
+            filter: blur(60px);
+            z-index: 0;
+        }
+
+        .floating-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .floating-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -150px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(20, 168, 168, 0.08));
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-wrapper:hover {
+            box-shadow: 
+                0 30px 60px -12px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+        }
+
+        /* Left Side - Premium Branding */
+        .brand-side {
+            flex: 1;
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.2), transparent 60%);
+            pointer-events: none;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 60px;
+        }
+
+        .brand-logo i {
+            font-size: 32px;
+            color: #10b981;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-logo span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            margin-bottom: 50px;
+        }
+
+        .brand-tagline h2 {
+            color: #fff;
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .brand-tagline h2 span {
+            color: #10b981;
+            position: relative;
+            display: inline-block;
+        }
+
+        .brand-tagline h2 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 4px;
+            z-index: -1;
+        }
+
+        .brand-tagline p {
+            color: #94a3b8;
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .brand-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-footer {
+            color: #475569;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-footer a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .brand-footer a:hover {
+            color: #34d399;
+        }
+
+        /* Right Side - Login Form */
+        .form-side {
+            flex: 1;
+            padding: 60px 50px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-header p {
+            color: #64748b;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        .form-header p a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .form-header p a:hover {
+            color: #059669;
+        }
+
+        /* Form Styles */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            letter-spacing: 0.3px;
+            margin-left: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: #94a3b8;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 16px 16px 16px 50px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s ease;
+            color: #0f172a;
+            font-weight: 400;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #a0afc0;
+            font-weight: 300;
+            font-size: 14px;
+        }
+
+        .input-wrapper input:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .input-wrapper input:focus + i {
+            color: #10b981;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            left: auto;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-password:hover {
+            color: #10b981;
+        }
+
+        /* Form Options */
+        .form-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 5px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .checkbox-wrapper span {
+            font-size: 14px;
+            color: #475569;
+            font-weight: 400;
+        }
+
+        .forgot-link {
+            color: #10b981;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .forgot-link:hover {
+            color: #059669;
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .login-btn {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            color: #fff;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.3);
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn i {
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .login-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Social Login */
+        .social-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .social-section p {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .social-section p::before,
+        .social-section p::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+        }
+
+        .social-section p::before {
+            left: 0;
+        }
+
+        .social-section p::after {
+            right: 0;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 20px;
+        }
+
+        .social-icon:hover {
+            background: #fff;
+            border-color: #10b981;
+            color: #10b981;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Register Link at Bottom */
+        .register-link {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .login-wrapper {
+                flex-direction: column;
+                max-width: 500px;
+            }
+
+            .brand-side {
+                padding: 40px 30px;
+            }
+
+            .brand-logo {
+                margin-bottom: 30px;
+            }
+
+            .brand-tagline h2 {
+                font-size: 28px;
+            }
+
+            .brand-stats {
+                margin-bottom: 20px;
+            }
+
+            .form-side {
+                padding: 40px 30px;
+            }
+
+            .register-link {
+                display: block;
+                text-align: center;
+                margin-top: 25px;
+                color: #64748b;
+                font-size: 14px;
+            }
+
+            .register-link a {
+                color: #10b981;
+                text-decoration: none;
+                font-weight: 600;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .login-wrapper {
+                border-radius: 30px;
+            }
+
+            .brand-side {
+                padding: 30px 20px;
+            }
+
+            .form-side {
+                padding: 30px 20px;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+        }
+
+        /* Animation Classes */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeUp {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-element floating-1"></div>
+    <div class="floating-element floating-2"></div>
+
+    <div class="container">
+        <div class="login-wrapper animate-fadeUp">
+            <!-- Left Side - Premium Branding -->
+            <div class="brand-side">
+                <div class="brand-content">
+                    <div class="brand-logo">
+                        <i class="fas fa-hard-hat"></i>
+                        <span>LabourConnect</span>
+                    </div>
+                    
+                    <div class="brand-tagline">
+                        <h2 class="animate-fadeUp delay-1">
+                            Welcome back,
+                            <span>Skilled Worker</span>
+                        </h2>
+                        <p class="animate-fadeUp delay-2">Access your dashboard to find daily work opportunities and connect with employers instantly.</p>
+                    </div>
+
+                    <div class="brand-stats animate-fadeUp delay-3">
+                        <div class="stat-item">
+                            <div class="stat-value">10k+</div>
+                            <div class="stat-label">Active Jobs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5k+</div>
+                            <div class="stat-label">Workers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98%</div>
+                            <div class="stat-label">Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-footer animate-fadeUp delay-3">
+                    <p>© 2024 LabourConnect • <a href="#">Privacy</a> • <a href="#">Terms</a></p>
+                </div>
+            </div>
+
+            <!-- Right Side - Login Form -->
+            <div class="form-side">
+                <div class="form-header">
+                    <h1 class="animate-fadeUp">Worker Login</h1>
+                    <p class="animate-fadeUp delay-1">Don't have an account? <a href="{% url 'worker_register' %}">Register here</a></p>
+                </div>
+
+                <form class="login-form" method="post" action="{% url 'worker_login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="input-group animate-fadeUp delay-1">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group animate-fadeUp delay-2">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-options animate-fadeUp delay-2">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                        {% comment %} <a href="{% url 'worker_forgot_password' %}" class="forgot-link">Forgot Password?</a> {% endcomment %}
+                    </div>
+
+                    <button type="submit" class="login-btn animate-fadeUp delay-3">
+                        <span>Login to Dashboard</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="social-section animate-fadeUp delay-3">
+                    <p>Or continue with</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-google"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <!-- Mobile Register Link -->
+                <div class="register-link">
+                    <p>New to LabourConnect? <a href="{% url 'worker_register' %}">Create account</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Smooth animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fadeUp').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Input focus effects
+        const inputs = document.querySelectorAll('.input-wrapper input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('i:first-child').style.color = '#10b981';
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.querySelector('i:first-child').style.color = '#94a3b8';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
