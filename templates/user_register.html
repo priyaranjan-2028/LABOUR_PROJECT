@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Registration - LabourConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% load static %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .register-wrapper {
+            display: flex;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #edf2f7;
+        }
+
+        /* Left Side */
+        .brand-side {
+            flex: 1;
+            background: #0f3b3a;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 48px;
+        }
+
+        .brand-logo i {
+            font-size: 28px;
+            color: #2dd4bf;
+        }
+
+        .brand-logo span {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-tagline {
+            margin-bottom: 48px;
+        }
+
+        .brand-tagline h2 {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .brand-tagline h2 span {
+            color: #2dd4bf;
+        }
+
+        .brand-tagline p {
+            color: #a5f3fc;
+            font-size: 15px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(45, 212, 191, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2dd4bf;
+            font-size: 18px;
+        }
+
+        .feature-text h4 {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            color: #a5f3fc;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .brand-footer {
+            margin-top: auto;
+            color: #a5f3fc;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .brand-footer a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Right Side */
+        .form-side {
+            flex: 1.3;
+            padding: 48px 56px;
+            background: #ffffff;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .form-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .form-header p a {
+            color: #0f3b3a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-header p a:hover {
+            color: #2dd4bf;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            margin-bottom: 32px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e9edf2;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #0f3b3a;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            width: 36px;
+            height: 36px;
+            background: #ffffff;
+            border: 2px solid #e9edf2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #0f3b3a;
+            border-color: #0f3b3a;
+            color: #ffffff;
+        }
+
+        .step.completed {
+            background: #0f3b3a;
+            border-color: #0f3b3a;
+            color: #ffffff;
+        }
+
+        .step-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 0;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .step-label.active {
+            color: #0f3b3a;
+        }
+
+        /* Form */
+        .form-step {
+            display: block;
+        }
+
+        .form-step.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .form-group label i {
+            color: #2dd4bf;
+            margin-right: 6px;
+            font-size: 13px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e9edf2;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        .input-field:hover {
+            border-color: #cbd5e1;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+        }
+
+        /* Phone Input */
+        .phone-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .country-code {
+            width: 110px;
+        }
+
+        .country-code select {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e9edf2;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #ffffff;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        /* Location */
+        .location-wrapper {
+            position: relative;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e9edf2;
+            border-radius: 12px;
+            margin-top: 4px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: #f8fafc;
+            color: #0f3b3a;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* Password */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bars {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            flex: 1;
+            background: #e9edf2;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-bar.weak { background: #f87171; }
+        .strength-bar.medium { background: #fbbf24; }
+        .strength-bar.strong { background: #34d399; }
+
+        .strength-text {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .password-match {
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .match-success {
+            color: #10b981;
+        }
+
+        .match-error {
+            color: #ef4444;
+        }
+
+        /* Row Layout */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #e9edf2;
+            color: #475569;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: #0f3b3a;
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #1a4b4a;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Terms */
+        .terms-group {
+            margin-top: 24px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            cursor: pointer;
+            accent-color: #0f3b3a;
+        }
+
+        .checkbox-wrapper a {
+            color: #0f3b3a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .register-wrapper {
+                flex-direction: column;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .brand-side {
+                padding: 32px 28px;
+            }
+
+            .form-side {
+                padding: 32px 28px;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .phone-group {
+                flex-direction: column;
+            }
+
+            .country-code {
+                width: 100%;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .step-labels {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-wrapper">
+            <!-- Left Side -->
+            <div class="brand-side">
+                <div class="brand-content">
+                    <div class="brand-logo">
+                        <i class="fas fa-briefcase"></i>
+                        <span>LabourConnect</span>
+                    </div>
+                    
+                    <div class="brand-tagline">
+                        <h2>Hire skilled<br><span>workers today</span></h2>
+                        <p>Join 10,000+ employers who trust LabourConnect for their hiring needs</p>
+                    </div>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Verified workers</h4>
+                                <p>All profiles verified with background checks</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Quick hiring</h4>
+                                <p>Get matched with workers in 24 hours</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Secure payments</h4>
+                                <p>Escrow protection for every transaction</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-footer">
+                    <p>© 2024 LabourConnect • <a href="#">Privacy</a> • <a href="#">Terms</a></p>
+                </div>
+            </div>
+
+            <!-- Right Side -->
+            <div class="form-side">
+                <div class="form-header">
+                    <h1>Create employer account</h1>
+                    <p>Already registered? <a href="{% url 'user_login' %}">Sign in</a></p>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="progress-steps">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 33.33%"></div>
+                        </div>
+                        <div class="step active" id="step1">1</div>
+                        <div class="step" id="step2">2</div>
+                        <div class="step" id="step3">3</div>
+                    </div>
+                    <div class="step-labels">
+                        <span class="step-label active" id="label1">Basic info</span>
+                        <span class="step-label" id="label2">Location</span>
+                        <span class="step-label" id="label3">Security</span>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'user_register' %}" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <div class="success-message" id="successMessage" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Account created! Redirecting to login...</span>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="form-step" id="step1-content">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i>Full name</label>
+                            <input type="text" class="input-field" name="full_name" id="fullName" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i>Email address</label>
+                            <input type="email" class="input-field" name="email" id="email" placeholder="you@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i>Phone number</label>
+                            <div class="phone-group">
+                                <div class="country-code">
+                                    <select class="input-field" name="country_code" id="countryCode" required>
+                                        <option value="+91">+91 (IND)</option>
+                                        <option value="+1">+1 (USA)</option>
+                                        <option value="+44">+44 (UK)</option>
+                                        <option value="+971">+971 (UAE)</option>
+                                    </select>
+                                </div>
+                                <div class="phone-number">
+                                    <input type="tel" class="input-field" name="phone" id="phone" placeholder="98765 43210" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary" onclick="nextStep(2)">Continue <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="form-step hidden" id="step2-content">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i>Location</label>
+                            <div class="location-wrapper">
+                                <input type="text" class="input-field" id="locationInput" placeholder="Enter your city" required autocomplete="off">
+                                <div class="suggestions-box" id="suggestionsBox"></div>
+                            </div>
+                            <div class="field-hint">We'll show you workers in your area</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i>Company (optional)</label>
+                            <input type="text" class="input-field" name="company" id="company" placeholder="Enter company name">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="form-step hidden" id="step3-content">
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i>Password</label>
+                            <input type="password" class="input-field" name="password" id="password" placeholder="Create a password" required>
+                            
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bars">
+                                    <div class="strength-bar" id="bar1"></div>
+                                    <div class="strength-bar" id="bar2"></div>
+                                    <div class="strength-bar" id="bar3"></div>
+                                </div>
+                                <div class="strength-text" id="strengthText">Use 8+ characters with mix of letters & numbers</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i>Confirm password</label>
+                            <input type="password" class="input-field" name="confirm_password" id="confirmPassword" placeholder="Re-enter password" required>
+                            <div class="password-match" id="passwordMatch"></div>
+                        </div>
+
+                        <div class="terms-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="terms" id="terms" required>
+                                <span>I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></span>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                            <button type="submit" class="btn btn-primary" id="registerBtn">Create account <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Step navigation
+        let currentStep = 1;
+
+        function updateProgress(step) {
+            const progressFill = document.getElementById('progressFill');
+            const stepElements = {
+                1: document.getElementById('step1'),
+                2: document.getElementById('step2'),
+                3: document.getElementById('step3')
+            };
+            const labelElements = {
+                1: document.getElementById('label1'),
+                2: document.getElementById('label2'),
+                3: document.getElementById('label3')
+            };
+
+            // Update progress bar width
+            progressFill.style.width = (step * 33.33) + '%';
+
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                if (i < step) {
+                    stepElements[i].classList.add('completed');
+                    stepElements[i].classList.remove('active');
+                    labelElements[i].classList.remove('active');
+                } else if (i === step) {
+                    stepElements[i].classList.add('active');
+                    stepElements[i].classList.remove('completed');
+                    labelElements[i].classList.add('active');
+                } else {
+                    stepElements[i].classList.remove('active', 'completed');
+                    labelElements[i].classList.remove('active');
+                }
+            }
+        }
+
+        function nextStep(step) {
+            // Validate current step
+            if (currentStep === 1) {
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                
+                if (!fullName || !email || !phone) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                if (!email.includes('@') || !email.includes('.')) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+            }
+            
+            if (currentStep === 2) {
+                const location = document.getElementById('locationInput').value;
+                if (!location) {
+                    alert('Please enter your location');
+                    return;
+                }
+            }
+            
+            // Hide current step, show next
+            document.getElementById(`step${currentStep}-content`).classList.add('hidden');
+            document.getElementById(`step${step}-content`).classList.remove('hidden');
+            
+            currentStep = step;
+            updateProgress(step);
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step${currentStep}-content`).classList.add('hidden');
+            document.getElementById(`step${step}-content`).classList.remove('hidden');
+            
+            currentStep = step;
+            updateProgress(step);
+        }
+
+        // Password strength
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            
+            return strength;
+        }
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strength = checkPasswordStrength(password);
+            
+            // Reset bars
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`bar${i}`).className = 'strength-bar';
+            }
+            
+            // Update bars
+            for (let i = 1; i <= Math.min(strength, 3); i++) {
+                const bar = document.getElementById(`bar${i}`);
+                if (strength <= 1) bar.classList.add('weak');
+                else if (strength === 2) bar.classList.add('medium');
+                else bar.classList.add('strong');
+            }
+            
+            // Update text
+            const strengthText = document.getElementById('strengthText');
+            if (password.length === 0) {
+                strengthText.textContent = 'Use 8+ characters with mix of letters & numbers';
+            } else if (strength <= 1) {
+                strengthText.textContent = 'Weak password';
+            } else if (strength === 2) {
+                strengthText.textContent = 'Medium password';
+            } else {
+                strengthText.textContent = 'Strong password';
+            }
+        });
+
+        // Password match
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const matchDiv = document.getElementById('passwordMatch');
+            
+            if (confirm.length > 0) {
+                if (password === confirm) {
+                    matchDiv.innerHTML = '<span class="match-success"><i class="fas fa-check-circle"></i> Passwords match</span>';
+                } else {
+                    matchDiv.innerHTML = '<span class="match-error"><i class="fas fa-exclamation-circle"></i> Passwords do not match</span>';
+                }
+            } else {
+                matchDiv.innerHTML = '';
+            }
+        }
+
+        document.getElementById('password').addEventListener('keyup', checkPasswordMatch);
+        document.getElementById('confirmPassword').addEventListener('keyup', checkPasswordMatch);
+
+        // Location suggestions
+        const cities = [
+            'Mumbai, Maharashtra', 'Delhi, NCR', 'Bengaluru, Karnataka',
+            'Chennai, Tamil Nadu', 'Kolkata, West Bengal', 'Pune, Maharashtra',
+            'Hyderabad, Telangana', 'Ahmedabad, Gujarat', 'Jaipur, Rajasthan'
+        ];
+
+        document.getElementById('locationInput').addEventListener('input', function() {
+            const input = this.value.toLowerCase();
+            const box = document.getElementById('suggestionsBox');
+            
+            if (input.length > 1) {
+                const matches = cities.filter(city => city.toLowerCase().includes(input));
+                
+                if (matches.length > 0) {
+                    box.innerHTML = matches.map(city => 
+                        `<div class="suggestion-item" onclick="selectCity('${city}')">${city}</div>`
+                    ).join('');
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            } else {
+                box.style.display = 'none';
+            }
+        });
+
+        window.selectCity = function(city) {
+            document.getElementById('locationInput').value = city;
+            document.getElementById('suggestionsBox').style.display = 'none';
+        };
+
+        // Close suggestions on outside click
+        document.addEventListener('click', function(e) {
+            const input = document.getElementById('locationInput');
+            const box = document.getElementById('suggestionsBox');
+            if (!input.contains(e.target) && !box.contains(e.target)) {
+                box.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate all fields
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('locationInput').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            
+            if (!fullName || !email || !phone || !location || !password || !confirm) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            if (!terms) {
+                alert('Please accept the terms and conditions');
+                return;
+            }
+            
+            // Show success message
+            const btn = document.getElementById('registerBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            btn.disabled = true;
+            
+            document.getElementById('successMessage').style.display = 'flex';
+            
+            // Redirect after delay
+            setTimeout(() => {
+                window.location.href = "{% url 'user_login' %}";
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

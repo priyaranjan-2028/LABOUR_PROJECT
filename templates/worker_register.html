@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Registration - LabourConnect Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% load static %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Premium Background Pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(20, 168, 168, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 168, 168, 0.1));
+            filter: blur(60px);
+            z-index: 0;
+        }
+
+        .floating-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .floating-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -150px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(20, 168, 168, 0.08));
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .register-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .register-wrapper:hover {
+            box-shadow: 
+                0 30px 60px -12px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+        }
+
+        /* Left Side - Premium Branding */
+        .brand-side {
+            flex: 1;
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.2), transparent 60%);
+            pointer-events: none;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .brand-logo i {
+            font-size: 32px;
+            color: #10b981;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-logo span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .benefits-list {
+            margin-top: 30px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+
+        .benefit-item i {
+            width: 40px;
+            height: 40px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #10b981;
+            font-size: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .benefit-text h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .benefit-text p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .brand-footer {
+            color: #475569;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-footer a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Right Side - Registration Form */
+        .form-side {
+            flex: 1.5;
+            padding: 50px 45px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-height: 90vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #10b981 #e2e8f0;
+        }
+
+        .form-side::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .form-side::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .form-side::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 10px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .form-header p a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Form Styles */
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            letter-spacing: 0.3px;
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-group label i {
+            color: #10b981;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: #94a3b8;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input,
+        .input-wrapper select,
+        .input-wrapper textarea {
+            width: 100%;
+            padding: 15px 16px 15px 50px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s ease;
+            color: #0f172a;
+        }
+
+        .input-wrapper textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .input-wrapper input:hover,
+        .input-wrapper select:hover,
+        .input-wrapper textarea:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+        }
+
+        .input-wrapper input:focus,
+        .input-wrapper select:focus,
+        .input-wrapper textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .input-wrapper input:focus + i,
+        .input-wrapper select:focus + i,
+        .input-wrapper textarea:focus + i {
+            color: #10b981;
+        }
+
+        /* Expertise Toggle Section */
+        .expertise-section {
+            margin-top: 5px;
+        }
+
+        .expertise-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .expertise-label label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .selected-count {
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 500;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .expertise-toggle {
+            position: relative;
+        }
+
+        .expertise-toggle input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .expertise-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .expertise-toggle label i {
+            font-size: 18px;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+        }
+
+        .expertise-toggle input[type="checkbox"]:checked + label {
+            background: linear-gradient(145deg, #10b981, #059669);
+            border-color: #10b981;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -6px rgba(16, 185, 129, 0.4);
+        }
+
+        .expertise-toggle input[type="checkbox"]:checked + label i {
+            color: #fff;
+        }
+
+        .expertise-toggle label:hover {
+            border-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Location Input Specific */
+        .location-input-wrapper {
+            position: relative;
+        }
+
+        .suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            margin-top: 5px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: #f8fafc;
+            color: #10b981;
+        }
+
+        /* Phone Input Group */
+        .phone-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+        }
+
+        .country-code select {
+            padding: 15px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            cursor: pointer;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        /* Form Row */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Register Button */
+        .register-btn {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            color: #fff;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.3);
+        }
+
+        .register-btn:hover::before {
+            left: 100%;
+        }
+
+        .register-btn i {
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .register-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Terms Checkbox */
+        .terms-group {
+            margin-top: 10px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 5px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .checkbox-wrapper span {
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .checkbox-wrapper a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Login Link for Mobile */
+        .login-link-mobile {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .login-link-mobile a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1000px) {
+            .register-wrapper {
+                flex-direction: column;
+                max-width: 600px;
+            }
+
+            .brand-side {
+                padding: 40px 30px;
+            }
+
+            .benefits-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .benefit-item {
+                margin-bottom: 0;
+            }
+
+            .form-side {
+                padding: 40px 30px;
+                max-height: none;
+            }
+
+            .login-link-mobile {
+                display: block;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .phone-group {
+                flex-direction: column;
+            }
+
+            .country-code {
+                width: 100%;
+            }
+
+            .expertise-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-list {
+                grid-template-columns: 1fr;
+            }
+
+            .register-wrapper {
+                border-radius: 30px;
+            }
+        }
+
+        /* Animation Classes */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeUp {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #10b981;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-element floating-1"></div>
+    <div class="floating-element floating-2"></div>
+
+    <div class="container">
+        <div class="register-wrapper animate-fadeUp">
+            <!-- Left Side - Premium Branding -->
+            <div class="brand-side">
+                <div class="brand-content">
+                    <div class="brand-logo">
+                        <i class="fas fa-hard-hat"></i>
+                        <span>LabourConnect</span>
+                    </div>
+                    
+                    <h2 style="color: #fff; font-size: 28px; margin-bottom: 20px;">Join as a <span style="color: #10b981;">Skilled Worker</span></h2>
+                    
+                    <div class="benefits-list">
+                        <div class="benefit-item animate-fadeUp delay-1">
+                            <i class="fas fa-bolt"></i>
+                            <div class="benefit-text">
+                                <h4>Daily Work Opportunities</h4>
+                                <p>Get matched with jobs that match your skills</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item animate-fadeUp delay-2">
+                            <i class="fas fa-shield-alt"></i>
+                            <div class="benefit-text">
+                                <h4>Secure Payments</h4>
+                                <p>Get paid safely and on time, every time</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item animate-fadeUp delay-3">
+                            <i class="fas fa-star"></i>
+                            <div class="benefit-text">
+                                <h4>Build Your Reputation</h4>
+                                <p>Earn ratings and grow your career</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item animate-fadeUp delay-4">
+                            <i class="fas fa-clock"></i>
+                            <div class="benefit-text">
+                                <h4>Flexible Schedule</h4>
+                                <p>Choose when and where you want to work</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-footer animate-fadeUp delay-4">
+                    <p>© 2024 LabourConnect • <a href="#">Privacy</a> • <a href="#">Terms</a></p>
+                </div>
+            </div>
+
+            <!-- Right Side - Registration Form -->
+            <div class="form-side">
+                <div class="form-header">
+                    <h1 class="animate-fadeUp">Create Worker Account</h1>
+                    <p class="animate-fadeUp delay-1">Already have an account? <a href="{% url 'worker_login' %}">Sign in</a></p>
+                </div>
+
+                <form class="register-form" method="post" action="{% url 'worker_register' %}" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <!-- Success Message (hidden by default) -->
+                    <div class="success-message" id="successMessage" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Registration successful! Redirecting to login...</span>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="input-group animate-fadeUp delay-1">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="full_name" placeholder="Enter your full name" required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="input-group animate-fadeUp delay-1">
+                        <label><i class="fas fa-envelope"></i> Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+
+                    <!-- Phone Number with Country Code -->
+                    <div class="input-group animate-fadeUp delay-2">
+                        <label><i class="fas fa-phone"></i> Phone Number</label>
+                        <div class="phone-group">
+                            <div class="country-code">
+                                <select name="country_code" required>
+                                    <option value="+91">+91 (IND)</option>
+                                    <option value="+1">+1 (USA)</option>
+                                    <option value="+44">+44 (UK)</option>
+                                    <option value="+61">+61 (AUS)</option>
+                                    <option value="+971">+971 (UAE)</option>
+                                </select>
+                            </div>
+                            <div class="phone-number">
+                                <div class="input-wrapper">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" name="phone" placeholder="Phone number" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location with Autocomplete -->
+                    <div class="input-group animate-fadeUp delay-2">
+                        <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                        <div class="input-wrapper location-input-wrapper">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" name="location" id="locationInput" placeholder="Enter your city/area" required autocomplete="off">
+                            <div class="suggestions-box" id="suggestionsBox">
+                                <!-- Suggestions will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="input-group animate-fadeUp delay-3">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="password" id="password" placeholder="Create a password" required>
+                            <i class="fas fa-eye toggle-password" id="togglePassword" style="left: auto; right: 16px;"></i>
+                        </div>
+                        <small style="color: #64748b; margin-top: 5px;">Minimum 8 characters with 1 number</small>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="input-group animate-fadeUp delay-3">
+                        <label><i class="fas fa-lock"></i> Confirm Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm your password" required>
+                            <i class="fas fa-eye toggle-password" id="toggleConfirmPassword" style="left: auto; right: 16px;"></i>
+                        </div>
+                        <div id="passwordMatch" style="font-size: 13px; margin-top: 5px;"></div>
+                    </div>
+
+                    <!-- Expertise Selection (Toggle Style) -->
+                    <div class="expertise-section animate-fadeUp delay-4">
+                        <div class="expertise-label">
+                            <label><i class="fas fa-tools"></i> Select Your Expertise <span style="color: #ef4444; font-size: 12px;">(Select multiple)</span></label>
+                            <span class="selected-count" id="selectedCount">0 selected</span>
+                        </div>
+                        
+                        <div class="expertise-grid">
+                            <!-- Construction & Labor -->
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_mason" value="Mason">
+                                <label for="exp_mason"><i class="fas fa-trowel"></i> Mason</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_carpenter" value="Carpenter">
+                                <label for="exp_carpenter"><i class="fas fa-hammer"></i> Carpenter</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_electrician" value="Electrician">
+                                <label for="exp_electrician"><i class="fas fa-bolt"></i> Electrician</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_plumber" value="Plumber">
+                                <label for="exp_plumber"><i class="fas fa-wrench"></i> Plumber</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_painter" value="Painter">
+                                <label for="exp_painter"><i class="fas fa-paint-roller"></i> Painter</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_welder" value="Welder">
+                                <label for="exp_welder"><i class="fas fa-fire"></i> Welder</label>
+                            </div>
+                            
+                            <!-- Driving & Transport -->
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_driver" value="Driver">
+                                <label for="exp_driver"><i class="fas fa-truck"></i> Driver</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_heavy" value="Heavy Equipment Operator">
+                                <label for="exp_heavy"><i class="fas fa-tractor"></i> Heavy Equipment</label>
+                            </div>
+                            
+                            <!-- Cleaning & Maintenance -->
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_cleaner" value="Cleaner">
+                                <label for="exp_cleaner"><i class="fas fa-broom"></i> Cleaner</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_gardener" value="Gardener">
+                                <label for="exp_gardener"><i class="fas fa-seedling"></i> Gardener</label>
+                            </div>
+                            
+                            <!-- Other Skills -->
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_packer" value="Packer/Mover">
+                                <label for="exp_packer"><i class="fas fa-boxes"></i> Packer/Mover</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_helper" value="General Helper">
+                                <label for="exp_helper"><i class="fas fa-hand-paper"></i> General Helper</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_cook" value="Cook">
+                                <label for="exp_cook"><i class="fas fa-utensils"></i> Cook</label>
+                            </div>
+                            <div class="expertise-toggle">
+                                <input type="checkbox" name="expertise" id="exp_security" value="Security Guard">
+                                <label for="exp_security"><i class="fas fa-shield-alt"></i> Security</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info (Optional) -->
+                    <div class="input-group animate-fadeUp delay-4">
+                        <label><i class="fas fa-comment"></i> Brief Introduction (Optional)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-comment"></i>
+                            <textarea name="bio" placeholder="Tell employers about your experience and skills..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="terms-group animate-fadeUp delay-4">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="terms" required>
+                            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="register-btn animate-fadeUp delay-4" id="registerBtn">
+                        <span>Create Account</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <!-- Mobile Login Link -->
+                <div class="login-link-mobile">
+                    <p>Already have an account? <a href="{% url 'worker_login' %}">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        if (toggleConfirmPassword && confirmPasswordInput) {
+            toggleConfirmPassword.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Password Match Validation
+        function checkPasswordMatch() {
+            if (passwordInput && confirmPasswordInput) {
+                if (passwordInput.value && confirmPasswordInput.value) {
+                    if (passwordInput.value === confirmPasswordInput.value) {
+                        document.getElementById('passwordMatch').innerHTML = '<span style="color: #10b981;">✓ Passwords match</span>';
+                    } else {
+                        document.getElementById('passwordMatch').innerHTML = '<span style="color: #ef4444;">✗ Passwords do not match</span>';
+                    }
+                } else {
+                    document.getElementById('passwordMatch').innerHTML = '';
+                }
+            }
+        }
+
+        if (passwordInput && confirmPasswordInput) {
+            passwordInput.addEventListener('keyup', checkPasswordMatch);
+            confirmPasswordInput.addEventListener('keyup', checkPasswordMatch);
+        }
+
+        // Expertise Selection Counter
+        const expertiseCheckboxes = document.querySelectorAll('input[name="expertise"]');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        function updateSelectedCount() {
+            const checkedCount = document.querySelectorAll('input[name="expertise"]:checked').length;
+            selectedCountSpan.textContent = checkedCount + ' selected';
+            
+            // Visual feedback for selection
+            if (checkedCount > 0) {
+                selectedCountSpan.style.background = 'rgba(16, 185, 129, 0.2)';
+            } else {
+                selectedCountSpan.style.background = 'rgba(16, 185, 129, 0.1)';
+            }
+        }
+
+        expertiseCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        // Location Autocomplete (Sample Indian Cities)
+        const locationInput = document.getElementById('locationInput');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+
+        const indianCities = [
+            'Mumbai, Maharashtra',
+            'Delhi, NCR',
+            'Bengaluru, Karnataka',
+            'Chennai, Tamil Nadu',
+            'Kolkata, West Bengal',
+            'Pune, Maharashtra',
+            'Hyderabad, Telangana',
+            'Ahmedabad, Gujarat',
+            'Jaipur, Rajasthan',
+            'Lucknow, Uttar Pradesh',
+            'Chandigarh, Punjab',
+            'Bhopal, Madhya Pradesh',
+            'Patna, Bihar',
+            'Bhubaneswar, Odisha',
+            'Guwahati, Assam'
+        ];
+
+        if (locationInput) {
+            locationInput.addEventListener('input', function() {
+                const inputValue = this.value.toLowerCase();
+                if (inputValue.length > 1) {
+                    const matches = indianCities.filter(city => 
+                        city.toLowerCase().includes(inputValue)
+                    );
+                    
+                    if (matches.length > 0) {
+                        suggestionsBox.innerHTML = matches.map(city => 
+                            `<div class="suggestion-item" onclick="selectCity('${city}')">${city}</div>`
+                        ).join('');
+                        suggestionsBox.style.display = 'block';
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!locationInput.contains(event.target) && !suggestionsBox.contains(event.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        }
+
+        function selectCity(city) {
+            locationInput.value = city;
+            suggestionsBox.style.display = 'none';
+        }
+
+        // Form Submission with Loading State
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate at least one expertise selected
+                const checkedExpertise = document.querySelectorAll('input[name="expertise"]:checked').length;
+                if (checkedExpertise === 0) {
+                    alert('Please select at least one expertise area');
+                    return;
+                }
+
+                // Validate passwords match
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    alert('Passwords do not match');
+                    return;
+                }
+
+                // Show loading state
+                registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                registerBtn.disabled = true;
+
+                // Simulate form submission (replace with actual form submission)
+                setTimeout(() => {
+                    successMessage.style.display = 'flex';
+                    registerForm.style.opacity = '0.7';
+                    
+                    setTimeout(() => {
+                        window.location.href = "{% url 'worker_dashboard' %}";
+                    }, 2000);
+                }, 1500);
+            });
+        }
+
+        // Animation observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fadeUp').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Input focus effects
+        const inputs = document.querySelectorAll('.input-wrapper input, .input-wrapper select, .input-wrapper textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                const icon = this.parentElement.querySelector('i:first-child');
+                if (icon) icon.style.color = '#10b981';
+            });
+            
+            input.addEventListener('blur', function() {
+                const icon = this.parentElement.querySelector('i:first-child');
+                if (icon && !this.value) {
+                    icon.style.color = '#94a3b8';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
