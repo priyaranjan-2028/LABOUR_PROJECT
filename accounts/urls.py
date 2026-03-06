@@ -5,5 +5,9 @@ from accounts import views
 
 urlpatterns = [
   path('', views.index, name='index'),
-  path('', views.register, name = 'register.html')
+  
+  path('worker_dashboard/', views.worker_dashboard, name='worker_dashboard'),
+ # path('login/', views.logi, name='login'),
+  path('forget_password/', views.forgot_password, name='forget_password'),
+
 ]

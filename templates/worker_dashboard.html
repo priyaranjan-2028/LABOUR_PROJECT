@@ -843,44 +843,44 @@
                             <h2 class="card-title">Update Profile</h2>
                         </div>
                         
-                        <!-- Django Form: <form method="POST" action="{% url 'update_profile' %}" enctype="multipart/form-data"> -->
+                    <form method="POST" action="{% url 'worker_dashboard' %}" enctype="multipart/form-data">
                         <form id="updateProfileForm">
-                            <!-- Django CSRF: {% csrf_token %} -->
+                            <Django CSRF: {% csrf_token %}> 
                             
                             <div class="form-group">
                                 <label class="form-label" for="fullName">Full Name</label>
                                 <input type="text" id="fullName" name="full_name" class="form-input" 
-                                       value="John Doe" required>
-                                <!-- Django: value="{{ worker.full_name }}" -->
+                                       value="{{ worker.full_name }}" required>
+                                
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="email">Email Address</label>
                                 <input type="email" id="email" name="email" class="form-input" 
-                                       value="john.doe@example.com" required>
-                                <!-- Django: value="{{ worker.email }}" -->
+                                       value="{{ worker.email }}" required>
+                               
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="phone">Phone Number</label>
                                 <input type="tel" id="phone" name="phone" class="form-input" 
-                                       value="+91 98765 43210" required>
-                                <!-- Django: value="{{ worker.phone }}" -->
+                                       value="{{ worker.phone }}" required>
+                               
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="location">Location</label>
                                 <input type="text" id="location" name="location" class="form-input" 
-                                       value="Mumbai, Maharashtra" required>
-                                <!-- Django: value="{{ worker.location }}" -->
+                                       value="{{ worker.location }}" required>
+                                
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="expertise">Expertise / Skills</label>
                                 <input type="text" id="expertise" name="expertise" class="form-input" 
-                                       value="Carpentry, Plumbing, Electrical Work" 
+                                       value="{{ worker.expertise }}" 
                                        placeholder="Separate skills with commas">
-                                <!-- Django: value="{{ worker.expertise }}" -->
+                            
                             </div>
 
                             <div class="form-group">

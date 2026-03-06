@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -569,20 +571,18 @@
             <i class="fas fa-hands-helping"></i>
             <span>LabourConnect</span>
         </div>
-        <nav class="nav-links">
+       <nav class="nav-links">
             <a href="#home">Home</a>
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#contact">Contact</a>
-            <button class="login-btn" id="openLogin">
-                <i class="fas fa-sign-in-alt"></i>
-                Login / Sign Up
-            </button>
-        </nav>
-        <button class="login-btn mobile-login" id="openLoginMobile">
+            <a href="{% url 'login' %}" class="login-btn">
             <i class="fas fa-sign-in-alt"></i>
-            Login
-        </button>
+                Login
+        </a>
+        </nav>
+
+
     </header>
 
     <!-- Hero Section -->
@@ -591,12 +591,10 @@
             <h1>Connecting <span>Skilled Labour</span> with Opportunities Daily</h1>
             <p>Find daily work opportunities or hire reliable labour for your projects. Our platform connects thousands of skilled workers with employers in real-time.</p>
             <div class="cta-buttons">
-                <a href="#" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Find Work
-                </a>
-                <a href="#" class="btn btn-secondary">
-                    <i class="fas fa-user-tie"></i> Hire Labour
-                </a>
+                    <a href="{% url 'register' %}"class="btn btn-primary">Find Work</a>
+                    <a href="{% url 'register' %}"class="btn btn-secondary">Hire Labour</a>
+
+
             </div>
             <div class="stats-mini">
                 <div class="stat-mini">
@@ -753,27 +751,7 @@
             <p>&copy; 2023 Daily Labour Connect Platform. All rights reserved.</p>
         </div>
     </footer>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Welcome Back</h2>
-                <button class="close-modal" id="closeLogin">&times;</button>
-            </div>
-            <form class="login-form">
-                <input type="email" placeholder="Email Address" required>
-                <input type="password" placeholder="Password" required>
-                <button type="submit">Sign In</button>
-                <div class="form-footer">
-                    <p>Don't have an account? <a href="#" id="switchToSignup">Sign Up</a></p>
-                    <p><a href="#">Forgot Password?</a></p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
+<script>
         // 3D Scene with Three.js - NETWORK VISUALIZATION
         let scene, camera, renderer, controls;
         let nodes = [];
