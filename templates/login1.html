@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Labour Connect · Platform</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+/* YOUR SAME CSS (UNCHANGED) */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(145deg,#e9f0f5 0%,#d6e2ed 100%);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:1.5rem;
+}
+
+.glass-panel{
+max-width:1200px;
+width:100%;
+background:rgba(255,255,255,0.4);
+backdrop-filter:blur(12px);
+border-radius:4rem 4rem 3rem 3rem;
+box-shadow:0 25px 50px -10px rgba(0,20,30,0.25);
+padding:3rem 2rem 4rem 2rem;
+}
+
+h1{
+font-size:2.8rem;
+font-weight:700;
+color:#0a2e3f;
+text-align:center;
+margin-bottom:1rem;
+}
+
+.sub-head{
+text-align:center;
+font-size:1.2rem;
+color:#1f4b64;
+margin-bottom:3rem;
+}
+
+.grid-four{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:1.8rem;
+}
+
+.square-card{
+aspect-ratio:1/1;
+background:white;
+border-radius:2.5rem;
+box-shadow:0 20px 30px -8px rgba(0,40,50,0.2);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:1.2rem;
+transition:0.3s;
+cursor:pointer;
+}
+
+.square-card:hover{
+transform:translateY(-6px);
+box-shadow:0 28px 38px -10px #0a3b4b70;
+}
+
+.card-icon{
+font-size:3.5rem;
+color:#115e7a;
+margin-bottom:10px;
+}
+
+.card-role{
+font-size:2rem;
+font-weight:700;
+color:#093346;
+}
+
+.action-badge{
+margin-top:10px;
+}
+
+.badge{
+background:white;
+border-radius:40px;
+padding:0.5rem 1.2rem;
+font-weight:600;
+font-size:1rem;
+color:#0b3b4f;
+border:1px solid #9fc5d6;
+}
+
+.square-card:hover .badge{
+background:#115e7a;
+color:white;
+}
+
+/* responsive */
+
+@media(max-width:900px){
+.grid-four{
+grid-template-columns:repeat(2,1fr);
+}
+}
+
+@media(max-width:500px){
+.grid-four{
+grid-template-columns:1fr;
+}
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="glass-panel">
+
+<h1>🧑‍🌾 DAILY LABOUR CONNECT</h1>
+
+<div class="sub-head">
+<i class="fas fa-handshake"></i> bridging workers & employers
+</div>
+
+<div class="grid-four">
+
+<!-- USER LOGIN -->
+<div class="square-card card-user-login"
+onclick="window.location.href='{% url 'user_login' %}'">
+
+<div class="card-icon">
+<i class="fas fa-user-circle"></i>
+</div>
+
+<div class="card-role">USER</div>
+
+<div class="action-badge">
+<span class="badge">
+<i class="fas fa-arrow-right-to-bracket"></i> login
+</span>
+</div>
+
+<div style="font-size:0.9rem;margin-top:10px;color:#2c5c74;">
+find workers
+</div>
+
+</div>
+
+
+<!-- USER REGISTER -->
+<div class="square-card card-user-reg"
+onclick="window.location.href='{% url 'user_register' %}'">
+
+<div class="card-icon">
+<i class="fas fa-user-plus"></i>
+</div>
+
+<div class="card-role">USER</div>
+
+<div class="action-badge">
+<span class="badge">
+<i class="fas fa-pen-to-square"></i> register
+</span>
+</div>
+
+<div style="font-size:0.9rem;margin-top:10px;color:#2c5c74;">
+post jobs
+</div>
+
+</div>
+
+
+<!-- WORKER LOGIN -->
+<div class="square-card card-worker-login"
+onclick="window.location.href='{% url 'worker_login' %}'">
+
+<div class="card-icon">
+<i class="fas fa-hard-hat"></i>
+</div>
+
+<div class="card-role">WORKER</div>
+
+<div class="action-badge">
+<span class="badge">
+<i class="fas fa-arrow-right-to-bracket"></i> login
+</span>
+</div>
+
+<div style="font-size:0.9rem;margin-top:10px;color:#2c5c74;">
+view jobs
+</div>
+
+</div>
+
+
+<!-- WORKER REGISTER -->
+<div class="square-card card-worker-reg"
+onclick="window.location.href='{% url 'worker_register' %}'">
+
+<div class="card-icon">
+<i class="fas fa-helmet-safety"></i>
+</div>
+
+<div class="card-role">WORKER</div>
+
+<div class="action-badge">
+<span class="badge">
+<i class="fas fa-pen-to-square"></i> register
+</span>
+</div>
+
+<div style="font-size:0.9rem;margin-top:10px;color:#2c5c74;">
+join workforce
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

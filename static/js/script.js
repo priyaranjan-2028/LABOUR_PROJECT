@@ -1,155 +1,10 @@
-// Sample Data
-const workersData = [
-    {
-        id: 1,
-        name: "Rajesh Kumar",
-        skill: "Plumber",
-        category: "plumber",
-        photo: "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=2563eb&color=fff&size=200",
-        distance: "1.2 km",
-        rating: 4.8,
-        reviews: 156,
-        price: "₹350/hr",
-        availability: "available",
-        experience: "8 years",
-        phone: "+91 98765 43210",
-        description: "Expert plumber with extensive experience in all types of plumbing work."
-    },
-    {
-        id: 2,
-        name: "Amit Singh",
-        skill: "Electrician",
-        category: "electrician",
-        photo: "https://ui-avatars.com/api/?name=Amit+Singh&background=16a34a&color=fff&size=200",
-        distance: "2.5 km",
-        rating: 4.9,
-        reviews: 203,
-        price: "₹400/hr",
-        availability: "available",
-        experience: "10 years",
-        phone: "+91 98765 43211",
-        description: "Licensed electrician specializing in residential and commercial electrical work."
-    },
-    {
-        id: 3,
-        name: "Suresh Patel",
-        skill: "Carpenter",
-        category: "carpenter",
-        photo: "https://ui-avatars.com/api/?name=Suresh+Patel&background=f59e0b&color=fff&size=200",
-        distance: "0.8 km",
-        rating: 4.7,
-        reviews: 98,
-        price: "₹300/hr",
-        availability: "available",
-        experience: "6 years",
-        phone: "+91 98765 43212",
-        description: "Skilled carpenter for furniture making and home repairs."
-    },
-    {
-        id: 4,
-        name: "Vikram Sharma",
-        skill: "Painter",
-        category: "painter",
-        photo: "https://ui-avatars.com/api/?name=Vikram+Sharma&background=dc2626&color=fff&size=200",
-        distance: "3.1 km",
-        rating: 4.6,
-        reviews: 75,
-        price: "₹280/hr",
-        availability: "busy",
-        experience: "5 years",
-        phone: "+91 98765 43213",
-        description: "Professional painter with expertise in interior and exterior painting."
-    },
-    {
-        id: 5,
-        name: "Mohammed Ali",
-        skill: "Cleaner",
-        category: "cleaner",
-        photo: "https://ui-avatars.com/api/?name=Mohammed+Ali&background=7c3aed&color=fff&size=200",
-        distance: "1.9 km",
-        rating: 4.5,
-        reviews: 134,
-        price: "₹250/hr",
-        availability: "available",
-        experience: "4 years",
-        phone: "+91 98765 43214",
-        description: "Reliable cleaning service for homes and offices."
-    },
-    {
-        id: 6,
-        name: "Prakash Reddy",
-        skill: "Electrician",
-        category: "electrician",
-        photo: "https://ui-avatars.com/api/?name=Prakash+Reddy&background=16a34a&color=fff&size=200",
-        distance: "2.8 km",
-        rating: 4.7,
-        reviews: 112,
-        price: "₹380/hr",
-        availability: "available",
-        experience: "7 years",
-        phone: "+91 98765 43215",
-        description: "Experienced electrician for all electrical installations and repairs."
-    }
-];
-
-const historyData = [
-    {
-        id: 1,
-        workerId: 1,
-        workerName: "Rajesh Kumar",
-        workerSkill: "Plumber",
-        workerPhoto: "https://ui-avatars.com/api/?name=Rajesh+Kumar&background=2563eb&color=fff&size=200",
-        status: "completed",
-        date: "2026-02-10",
-        price: "₹700",
-        duration: "2 hours",
-        feedback: "Excellent work! Very professional and punctual.",
-        rating: 5
-    },
-    {
-        id: 2,
-        workerId: 2,
-        workerName: "Amit Singh",
-        workerSkill: "Electrician",
-        workerPhoto: "https://ui-avatars.com/api/?name=Amit+Singh&background=16a34a&color=fff&size=200",
-        status: "pending",
-        date: "2026-02-13",
-        price: "₹800",
-        duration: "2 hours",
-        feedback: null,
-        rating: null
-    },
-    {
-        id: 3,
-        workerId: 3,
-        workerName: "Suresh Patel",
-        workerSkill: "Carpenter",
-        workerPhoto: "https://ui-avatars.com/api/?name=Suresh+Patel&background=f59e0b&color=fff&size=200",
-        status: "completed",
-        date: "2026-02-08",
-        price: "₹900",
-        duration: "3 hours",
-        feedback: "Good quality work. Would hire again.",
-        rating: 4
-    },
-    {
-        id: 4,
-        workerId: 4,
-        workerName: "Vikram Sharma",
-        workerSkill: "Painter",
-        workerPhoto: "https://ui-avatars.com/api/?name=Vikram+Sharma&background=dc2626&color=fff&size=200",
-        status: "cancelled",
-        date: "2026-02-05",
-        price: "₹560",
-        duration: "2 hours",
-        feedback: null,
-        rating: null
-    }
-];
+// Variables to hold backend data
+let workersData = [];
+let historyData = [];
 
 // State Management
 let currentFilter = 'all';
-let currentWorkers = [...workersData];
+let currentWorkers = [];
 let selectedWorker = null;
 let currentHistoryFilter = 'all';
 
@@ -260,7 +115,7 @@ function setupEventListeners() {
 
     document.getElementById('proceedConfirm').addEventListener('click', () => {
         confirmModal.classList.remove('active');
-        sendWorkRequest();
+        showToast(`Work request sent to ${selectedWorker.name}!`, 'success');
     });
 
     // Feedback Modal
@@ -458,17 +313,6 @@ function confirmRequest() {
     document.getElementById('confirmTitle').textContent = 'Confirm Work Request';
     document.getElementById('confirmMessage').textContent = `Send work request to ${selectedWorker.name}?`;
     confirmModal.classList.add('active');
-}
-
-// Send Work Request
-function sendWorkRequest() {
-    showToast(`Work request sent to ${selectedWorker.name}!`, 'success');
-    addNotification('Request Sent', `Your request has been sent to ${selectedWorker.name}`, 'info');
-    
-    // Simulate response after 3 seconds
-    setTimeout(() => {
-        addNotification('Request Accepted', `${selectedWorker.name} accepted your work request`, 'success');
-    }, 3000);
 }
 
 // History Functions
@@ -694,14 +538,3 @@ function formatDate(dateString) {
         year: 'numeric' 
     });
 }
-
-// Simulate real-time updates
-setInterval(() => {
-    // Randomly update worker availability
-    const randomWorker = workersData[Math.floor(Math.random() * workersData.length)];
-    randomWorker.availability = randomWorker.availability === 'available' ? 'busy' : 'available';
-    
-    if (historySection.style.display === 'none') {
-        renderWorkers();
-    }
-}, 30000); // Every 30 seconds
