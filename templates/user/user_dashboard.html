@@ -6,6 +6,9 @@
     <title>Labour Connect - User Dashboard</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhSHl3n_-F7UuOvB--UIw-3pqhbOppfRk&callback=initMap" async defer></script>
+    <!-- No inline styles needed except for dynamic data -->
 </head>
 <body>
     <!-- Header -->
@@ -20,6 +23,9 @@
                 <span>Labour Connect</span>
             </div>
             <div class="header-actions">
+                <div class="user-greeting">
+                    <span>Welcome, <strong id="displayName">{{ user.userprofile.full_name|default:user.username }}</strong></span>
+                </div>
                 <div class="notification-icon" id="notificationBtn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -28,7 +34,7 @@
                     <span class="notification-badge" id="notificationBadge">3</span>
                 </div>
                 <div class="profile-icon" id="profileBtn">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff" alt="Profile">
+                    <img src="https://ui-avatars.com/api/?name={{ user.userprofile.full_name|default:user.username }}&background=2563eb&color=fff" alt="Profile">
                 </div>
             </div>
         </div>
@@ -41,30 +47,7 @@
             <button class="close-btn" id="closeNotifications">&times;</button>
         </div>
         <div class="notification-list" id="notificationList">
-            <div class="notification-item unread">
-                <div class="notification-icon success">✓</div>
-                <div class="notification-content">
-                    <p class="notification-title">Request Accepted</p>
-                    <p class="notification-text">Rajesh Kumar accepted your work request</p>
-                    <span class="notification-time">5 mins ago</span>
-                </div>
-            </div>
-            <div class="notification-item unread">
-                <div class="notification-icon info">ℹ</div>
-                <div class="notification-content">
-                    <p class="notification-title">Work Completed</p>
-                    <p class="notification-text">Your plumbing job has been completed</p>
-                    <span class="notification-time">1 hour ago</span>
-                </div>
-            </div>
-            <div class="notification-item">
-                <div class="notification-icon warning">!</div>
-                <div class="notification-content">
-                    <p class="notification-title">Request Declined</p>
-                    <p class="notification-text">Amit Singh is not available today</p>
-                    <span class="notification-time">3 hours ago</span>
-                </div>
-            </div>
+            <!-- Notifications will be loaded here -->
         </div>
     </div>
 
@@ -77,75 +60,68 @@
             </div>
             <div class="profile-content">
                 <div class="profile-avatar-section">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff&size=120" alt="Profile" class="profile-avatar">
-                    <button class="change-photo-btn">Change Photo</button>
+                    <img src="https://ui-avatars.com/api/?name={{ user.userprofile.full_name|default:user.username }}&background=2563eb&color=fff&size=120" alt="Profile" class="profile-avatar">
+                    <button class="change-photo-btn" id="changePhotoBtn">Change Photo</button>
                 </div>
-                <div class="profile-details">
-                    <div class="profile-field">
-                        <label>Name</label>
-                        <input type="text" value="John Doe" id="profileName">
+                <form id="profileForm" method="POST" action="{% url 'user:update_profile' %}">
+                    {% csrf_token %}
+                    <div class="profile-details">
+                        <div class="profile-field">
+                            <label>Full Name</label>
+                            <input type="text" name="full_name" value="{{ user.userprofile.full_name }}" id="profileName">
+                        </div>
+                        <div class="profile-field">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" value="{{ user.userprofile.phone }}" id="profilePhone">
+                        </div>
+                        <div class="profile-field">
+                            <label>Address</label>
+                            <textarea name="location" id="profileAddress" rows="3">{{ user.userprofile.location }}</textarea>
+                        </div>
+                        <div class="profile-field">
+                            <label>Email</label>
+                            <input type="email" name="email" value="{{ user.email }}" id="profileEmail" readonly>
+                        </div>
+                        <div class="profile-field">
+                            <label>User Type</label>
+                            <input type="text" value="{{ user.userprofile.get_user_type_display }}" id="profileUserType" readonly>
+                        </div>
+                        {% if user.userprofile.company %}
+                        <div class="profile-field">
+                            <label>Company</label>
+                            <input type="text" name="company" value="{{ user.userprofile.company }}" id="profileCompany">
+                        </div>
+                        {% endif %}
                     </div>
-                    <div class="profile-field">
-                        <label>Phone Number</label>
-                        <input type="tel" value="+91 98765 43210" id="profilePhone">
+                    <div class="profile-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelEdit">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveProfile">Save Changes</button>
                     </div>
-                    <div class="profile-field">
-                        <label>Address</label>
-                        <textarea id="profileAddress" rows="3">123 Main Street, Sector 15, City Name, State - 400001</textarea>
-                    </div>
-                    <div class="profile-field">
-                        <label>Email</label>
-                        <input type="email" value="john.doe@example.com" id="profileEmail">
-                    </div>
-                </div>
-                <div class="profile-actions">
-                    <button class="btn btn-secondary" id="cancelEdit">Cancel</button>
-                    <button class="btn btn-primary" id="saveProfile">Save Changes</button>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Left Section: Map & Search -->
-        <aside class="left-section">
+    <!-- Main Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Top Panel: Map (1/3 height) - Like wallet app -->
+        <div class="map-panel">
             <div class="map-container">
-                <div id="map" class="map">
-                    <!-- Simulated Map -->
-                    <div class="map-placeholder">
-                        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                            <circle cx="30" cy="30" r="28" stroke="#2563eb" stroke-width="3" fill="#e0f2fe"/>
-                            <circle cx="30" cy="30" r="8" fill="#2563eb"/>
-                            <circle cx="30" cy="30" r="3" fill="white"/>
-                        </svg>
-                        <p>Your Location</p>
-                        <span class="map-note">Interactive map with nearby workers</span>
-                    </div>
-                    <!-- Worker Markers on Map -->
-                    <div class="map-marker" style="top: 20%; left: 30%;" data-worker="1">
-                        <div class="marker-pulse"></div>
-                        <div class="marker-icon">👷</div>
-                    </div>
-                    <div class="map-marker" style="top: 60%; left: 65%;" data-worker="2">
-                        <div class="marker-pulse"></div>
-                        <div class="marker-icon">🔧</div>
-                    </div>
-                    <div class="map-marker" style="top: 40%; left: 70%;" data-worker="3">
-                        <div class="marker-pulse"></div>
-                        <div class="marker-icon">⚡</div>
-                    </div>
-                </div>
+                <div id="map"></div>
             </div>
-            
+        </div>
+
+        <!-- Bottom Panel: Content (2/3 height) -->
+        <div class="content-panel">
+            <!-- Search Section -->
             <div class="search-section">
-                <h3>Find Workers</h3>
+                <h3>Find Workers Near You</h3>
                 <div class="search-box">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="8" cy="8" r="6"/>
                         <path d="M14 14l4 4"/>
                     </svg>
-                    <input type="text" id="searchInput" placeholder="Search by skill, category or service...">
+                    <input type="text" id="searchInput" placeholder="Search by skill, name or category...">
                 </div>
                 <div class="category-chips">
                     <button class="chip active" data-category="all">All</button>
@@ -154,19 +130,18 @@
                     <button class="chip" data-category="carpenter">Carpenter</button>
                     <button class="chip" data-category="painter">Painter</button>
                     <button class="chip" data-category="cleaner">Cleaner</button>
+                    <button class="chip" data-category="mechanic">Mechanic</button>
                 </div>
             </div>
-        </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
+            <!-- Content Header -->
             <div class="content-header">
                 <h2 id="contentTitle">Available Workers Near You</h2>
                 <div class="filter-sort">
                     <select id="sortBy">
                         <option value="distance">Sort by Distance</option>
                         <option value="rating">Sort by Rating</option>
-                        <option value="price">Sort by Price</option>
+                        <option value="experience">Sort by Experience</option>
                     </select>
                 </div>
             </div>
@@ -180,7 +155,7 @@
             <div class="history-section" id="historySection" style="display: none;">
                 <div class="section-header">
                     <h2>Work History</h2>
-                    <button class="btn btn-text" id="backToWorkers">← Back to Workers</button>
+                    <button class="btn-text" id="backToWorkers">← Back to Workers</button>
                 </div>
                 <div class="history-filters">
                     <button class="history-filter active" data-filter="all">All</button>
@@ -192,7 +167,7 @@
                     <!-- History items will be loaded here -->
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
     <!-- Worker Detail Modal -->
@@ -267,7 +242,24 @@
         </svg>
     </button>
 
-   {% load static %}
-    <script src="{% static 'js/script.js' %}"></script>
+    {% load static %}
+
+<script>
+const userData = {
+    fullName: "{{ user.userprofile.full_name|default:user.username }}",
+    email: "{{ user.email }}",
+    phone: "{{ user.userprofile.phone }}",
+    location: "{{ user.userprofile.location }}",
+    userType: "{{ user.userprofile.user_type }}",
+    csrfToken: "{{ csrf_token }}"
+};
+
+// User location from Django
+const userLat = {{ user_latitude|default:28.6139 }};
+const userLng = {{ user_longitude|default:77.2090 }};
+</script>
+
+<script src="{% static 'js/script.js' %}"></script>
+       
 </body>
 </html>

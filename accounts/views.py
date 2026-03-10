@@ -20,6 +20,20 @@ from django.contrib import messages
 import random
 from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import render
+
+# Create your views here.
+from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from accounts.models import UserProfile
+from django.contrib import messages
+
+
+# Create your views here.
+from geopy.geocoders import Nominatim
+
+from geopy.exc import GeocoderTimedOut
 # --- Helper Function ---
 def index(request):
     return render (request,"index.html")
@@ -33,69 +47,117 @@ def login1(request):
 
 
 # --- Worker Views ---
+import random
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from .models import Worker, WorkType
+
+import random
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from .models import Worker, WorkType
 
 
 def worker_register(request):
 
     works = WorkType.objects.all()
 
+    otp_sent = False
+    email_verified = False
+    message = ""
+    error = ""
+
     if request.method == "POST":
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        phone = request.POST.get("phone")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
-        intro = request.POST.get("introduction")
 
-        selected_works = request.POST.getlist("works")
+        # SEND OTP
+        if "send_otp" in request.POST:
 
-        if password != confirm_password:
-            return render(request, "worker_register.html", {"error":"Passwords do not match", "works":works})
+            name = request.POST.get("name")
+            email = request.POST.get("email")
 
-        worker = Worker.objects.create(
-            name=name,
-            email=email,
-            phone=phone,
-            password=password,
-            introduction=intro
-        )
+            otp = random.randint(100000, 999999)
 
-        worker.works.set(selected_works)
+            request.session["otp"] = str(otp)
+            request.session["email"] = email
+            request.session["name"] = name
 
-        return redirect("login")
+            send_mail(
+                "Your OTP",
+                f"Your OTP is {otp}",
+                "your_email@gmail.com",
+                [email],
+                fail_silently=False,
+            )
 
-    return render(request, "worker_register.html", {"works":works})
+            otp_sent = True
+            message = "OTP sent to your email"
 
-# send otp
-def send_otp(request):
-    data = json.loads(request.body)
-    email = data.get("email")
 
-    otp = random.randint(100000,999999)
+        # VERIFY OTP
+        elif "verify_otp" in request.POST:
 
-    request.session["otp"] = otp
-    request.session["email"] = email
+            user_otp = request.POST.get("otp")
 
-    send_mail(
-        "Your OTP",
-        f"Your OTP is {otp}",
-        "your_email@gmail.com",
-        [email],
-        fail_silently=False,
-    )
+            if user_otp == request.session.get("otp"):
 
-    return JsonResponse({"message":"OTP sent to email"})
+                request.session["email_verified"] = True
+                email_verified = True
+                message = "Email verified successfully"
 
-# verify otp
+            else:
+                otp_sent = True
+                error = "Invalid OTP"
 
-def verify_otp(request):
-    data = json.loads(request.body)
-    otp = data.get("otp")
 
-    if str(request.session.get("otp")) == str(otp):
-        return JsonResponse({"status":"success"})
-    else:
-        return JsonResponse({"status":"fail"})
+        # REGISTER WORKER
+        elif "register" in request.POST:
+
+            if not request.session.get("email_verified"):
+                error = "Please verify email first"
+            else:
+
+                name = request.session.get("name")
+                email = request.session.get("email")
+
+                phone = request.POST.get("phone")
+                password = request.POST.get("password")
+                confirm_password = request.POST.get("confirm_password")
+                intro = request.POST.get("introduction")
+
+                selected_works = request.POST.getlist("works")
+
+                if password != confirm_password:
+                    error = "Passwords do not match"
+                    email_verified = True
+
+                else:
+                    worker = Worker.objects.create(
+                        name=name,
+                        email=email,
+                        phone=phone,
+                        password=password,
+                        introduction=intro
+                    )
+
+                    worker.works.set(selected_works)
+
+                    request.session.flush()
+
+                    return redirect("worker_login")
+
+    if request.session.get("otp"):
+        otp_sent = True
+
+    if request.session.get("email_verified"):
+        email_verified = True
+
+    return render(request, "worker_register.html", {
+        "works": works,
+        "otp_sent": otp_sent,
+        "email_verified": email_verified,
+        "message": message,
+        "error": error
+    })
 
 
 def worker_login(request):
@@ -103,17 +165,19 @@ def worker_login(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        try:
-            worker = Worker.objects.get(email=email, password=password)
-            request.session["worker_id"] = worker.id
-            return redirect("worker_dashboard")
-        except Worker.DoesNotExist:
+        # Try to find worker with given email and password
+        worker = Worker.objects.filter(email=email, password=password).first()
+
+        if worker:
+            # ✅ Store email in session
+            request.session["worker_email"] = worker.email
+            return redirect("app1:dashboard1")  # redirect after login
+        else:
             return render(request, "worker_login.html", {"error": "Invalid email or password"})
 
     return render(request, "worker_login.html")
 
 
-# --- Shared & Dashboard ---
 
 
 def user_dashboard(request):
@@ -265,10 +329,18 @@ def user_login(request):
                 login(request, user)
                 if not remember:
                     request.session.set_expiry(0)
-                return redirect('user_dashboard')
+                return redirect('user:user_dashboard')
             else:
                 messages.error(request, 'This account is not registered as an employer.')
         else:
             messages.error(request, 'Invalid email or password.')
 
     return render(request, 'user_login.html')
+
+def select_location(request):
+    return render(request, 'location.html')
+# 
+
+
+
+

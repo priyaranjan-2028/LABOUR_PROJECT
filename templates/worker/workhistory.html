@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work History - Labour Connect</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: var(--bg-light);
+        }
+
+        .history-table th {
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .history-table td {
+            padding: 1rem 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.813rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge {
+            background: #eff6ff;
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .search-box {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 250px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-white);
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            
+            .history-table {
+                font-size: 0.875rem;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 0.625rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-history" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                    Work History
+                </h2>
+                <input type="text" placeholder="Search jobs..." class="search-box">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Client Name</th>
+                            <th>Work Type</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge">#JOB-1245</span></td>
+                            <td>Suresh Menon</td>
+                            <td>Plumbing Repair</td>
+                            <td>Dadar, Mumbai</td>
+                            <td>Feb 5, 2026</td>
+                            <td>₹850</td>
+                            <td><span class="status-tag status-completed">Completed</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#JOB-1232</span></td>
+                            <td>Meena Iyer</td>
+                            <td>Electrical Wiring</td>
+                            <td>Worli, Mumbai</td>
+                            <td>Feb 1, 2026</td>
+                            <td>₹1200</td>
+                            <td><span class="status-tag status-completed">Completed</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#JOB-1220</span></td>
+                            <td>Vikram Singh</td>
+                            <td>Carpentry</td>
+                            <td>Juhu, Mumbai</td>
+                            <td>Jan 28, 2026</td>
+                            <td>₹2000</td>
+                            <td><span class="status-tag status-cancelled">Cancelled</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#JOB-1215</span></td>
+                            <td>Anjali Desai</td>
+                            <td>Plumbing Installation</td>
+                            <td>Malad, Mumbai</td>
+                            <td>Jan 25, 2026</td>
+                            <td>₹1500</td>
+                            <td><span class="status-tag status-completed">Completed</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#JOB-1201</span></td>
+                            <td>Rohit Bhatt</td>
+                            <td>Electrical Repair</td>
+                            <td>Borivali, Mumbai</td>
+                            <td>Jan 20, 2026</td>
+                            <td>₹600</td>
+                            <td><span class="status-tag status-completed">Completed</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge">#JOB-1198</span></td>
+                            <td>Kavita Reddy</td>
+                            <td>Painting</td>
+                            <td>Andheri, Mumbai</td>
+                            <td>Jan 15, 2026</td>
+                            <td>₹2500</td>
+                            <td><span class="status-tag status-active">In Progress</span></td>
+                            <td><i class="fas fa-eye" style="color: var(--primary-color); cursor: pointer;"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Location</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #map { height: 90vh; width: 100%; }
+        #btn-select { position: absolute; bottom: 20px; left: 10px; z-index: 1000; padding: 10px; }
+        #btn-current { position: absolute; bottom: 20px; right: 10px; z-index: 1000; padding: 10px; }
+        #search-box { position: absolute; top: 10px; left: 10px; z-index: 1000; width: 300px; padding: 5px; }
+    </style>
+
+    <!-- Leaflet CSS/JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Geocoder for search -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+</head>
+<body>
+
+<div id="map"></div>
+<button id="btn-select">Select This Location</button>
+<button id="btn-current">Use Current Location</button>
+
+<script>
+let map, marker, selectedLatLng;
+
+// Initialize map
+map = L.map('map').setView([20.2961, 85.8245], 13); // Default Bhubaneswar
+
+// Add OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Add draggable marker at center
+marker = L.marker(map.getCenter(), {draggable: true}).addTo(map);
+selectedLatLng = marker.getLatLng();
+
+// Update coordinates when marker is dragged
+marker.on('dragend', function(e) {
+    selectedLatLng = e.target.getLatLng();
+});
+
+// Add search control using Leaflet Control Geocoder
+L.Control.geocoder({
+    defaultMarkGeocode: false
+}).on('markgeocode', function(e) {
+    const center = e.geocode.center;
+    marker.setLatLng(center);
+    map.setView(center, 15);
+    selectedLatLng = center;
+}).addTo(map);
+
+// Use current location button
+document.getElementById('btn-current').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const pos = [position.coords.latitude, position.coords.longitude];
+                map.setView(pos, 15);
+                marker.setLatLng(pos);
+                selectedLatLng = marker.getLatLng();
+            },
+            function(error) {
+                // Detailed error message
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("Permission denied. Please allow location access.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Position unavailable. Check your device or browser settings.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("Geolocation request timed out.");
+                        break;
+                    default:
+                        alert("Geolocation failed. Error code: " + error.code);
+                }
+            }
+        );
+    } else {
+        alert("Your browser doesn't support geolocation.");
+    }
+});
+
+// Select location button → return to registration page
+document.getElementById('btn-select').addEventListener('click', function() {
+    localStorage.setItem('selectedLocation', JSON.stringify({
+        lat: selectedLatLng.lat,
+        lng: selectedLatLng.lng
+    }));
+    window.location.href = "{% url 'worker_register' %}";
+});
+</script>
+</body>
+</html>

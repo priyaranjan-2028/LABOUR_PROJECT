@@ -5,105 +5,398 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employer Registration - LabourConnect</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {% load static %}
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
     <style>
+        :root {
+            --forest: #0f3b3a;
+            --forest-light: #164e4d;
+            --teal: #2dd4bf;
+            --teal-dim: rgba(45, 212, 191, 0.12);
+            --ink: #0d1b1a;
+            --slate: #475569;
+            --mist: #f1f5f4;
+            --white: #ffffff;
+            --border: #d4e0de;
+            --error: #ef4444;
+            --radius: 14px;
+            --shadow: 0 24px 60px -12px rgba(15, 59, 58, 0.14);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f9fafc;
+            font-family: 'DM Sans', sans-serif;
+            background: #ecf2f1;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            color: #1e293b;
+            padding: 28px 20px;
+            color: var(--ink);
         }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; }
+
+        /* Subtle background texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 20%, rgba(45,212,191,0.06) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(15,59,58,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container { width: 100%; max-width: 1180px; margin: 0 auto; position: relative; }
+
         .register-wrapper {
             display: flex;
-            background: #ffffff;
-            border-radius: 24px;
+            background: var(--white);
+            border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
-            border: 1px solid #edf2f7;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(15,59,58,0.08);
         }
-        /* Left Side */
+
+        /* ── Brand Side ── */
         .brand-side {
-            flex: 1;
-            background: #0f3b3a;
-            padding: 60px 48px;
+            width: 340px;
+            flex-shrink: 0;
+            background: var(--forest);
+            padding: 52px 40px;
             display: flex;
             flex-direction: column;
-            color: white;
+            position: relative;
+            overflow: hidden;
         }
-        .brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 60px; }
-        .brand-logo i { font-size: 32px; color: #2dd4bf; }
-        .brand-logo span { font-size: 24px; font-weight: 700; }
-        .brand-tagline h2 { font-size: 36px; line-height: 1.2; margin-bottom: 20px; }
-        .brand-tagline h2 span { color: #2dd4bf; }
-        .feature-list { margin-top: 40px; display: flex; flex-direction: column; gap: 30px; }
-        .feature-item { display: flex; gap: 15px; }
+
+        .brand-side::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: rgba(45, 212, 191, 0.07);
+        }
+        .brand-side::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(45, 212, 191, 0.05);
+        }
+
+        .brand-logo {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 52px; position: relative; z-index: 1;
+        }
+        .brand-logo .logo-icon {
+            width: 42px; height: 42px;
+            background: var(--teal);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-logo .logo-icon i { color: var(--forest); font-size: 18px; }
+        .brand-logo span { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: white; }
+
+        .brand-tagline { position: relative; z-index: 1; }
+        .brand-tagline h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 34px; line-height: 1.15;
+            color: white; margin-bottom: 14px;
+        }
+        .brand-tagline h2 span { color: var(--teal); }
+        .brand-tagline p { color: rgba(255,255,255,0.55); font-size: 14px; line-height: 1.6; }
+
+        .feature-list {
+            margin-top: 44px; display: flex; flex-direction: column;
+            gap: 22px; position: relative; z-index: 1;
+        }
+        .feature-item { display: flex; gap: 14px; align-items: flex-start; }
         .feature-icon {
-            width: 44px; height: 44px; background: rgba(45, 212, 191, 0.15);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #2dd4bf;
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: var(--teal-dim);
+            border: 1px solid rgba(45,212,191,0.2);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--teal); font-size: 15px;
         }
-        /* Right Side Form */
-        .form-side { flex: 1.4; padding: 60px; background: #ffffff; }
-        .form-header { margin-bottom: 32px; }
-        .form-header h1 { font-size: 28px; margin-bottom: 8px; }
-        .form-header p { color: #64748b; }
-        .form-header a { color: #0f3b3a; text-decoration: none; font-weight: 600; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .feature-text strong { display: block; color: white; font-size: 14px; font-weight: 600; }
+        .feature-text span { color: rgba(255,255,255,0.45); font-size: 12.5px; }
+
+        .brand-footer {
+            margin-top: auto; padding-top: 40px; position: relative; z-index: 1;
+        }
+        .step-dots { display: flex; gap: 6px; }
+        .step-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .step-dot.active { width: 22px; border-radius: 3px; background: var(--teal); }
+
+        /* ── Form Side ── */
+        .form-side {
+            flex: 1;
+            padding: 52px 56px;
+            overflow-y: auto;
+            max-height: 95vh;
+        }
+
+        .form-header { margin-bottom: 36px; }
+        .form-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px; font-weight: 700; margin-bottom: 6px;
+        }
+        .form-header p { color: var(--slate); font-size: 14px; }
+        .form-header a {
+            color: var(--forest); text-decoration: none; font-weight: 600;
+            border-bottom: 1.5px solid var(--teal);
+        }
+
+        .section-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+            color: var(--teal); text-transform: uppercase;
+            margin: 28px 0 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-label::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
         .full-width { grid-column: span 2; }
+
         .form-group label {
-            display: block; font-size: 13px; font-weight: 600; color: #475569;
-            margin-bottom: 8px; text-transform: uppercase;
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--slate); margin-bottom: 7px;
+            text-transform: uppercase; letter-spacing: 0.04em;
         }
+
         .input-field {
-            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0;
-            border-radius: 10px; font-size: 14px; transition: all 0.2s;
+            width: 100%; padding: 11px 15px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; color: var(--ink);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .input-field:focus { outline: none; border-color: #0f3b3a; box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.05); }
-        .phone-input-group { display: grid; grid-template-columns: 100px 1fr; gap: 10px; }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--forest);
+            box-shadow: 0 0 0 4px rgba(15,59,58,0.06);
+        }
+        .input-field::placeholder { color: #94a3b8; }
+
+        .phone-group { display: grid; grid-template-columns: 100px 1fr; gap: 10px; }
+
+        /* ── Location Section ── */
+        .location-section { margin-top: 4px; }
+
+        .location-search-wrap {
+            position: relative; margin-bottom: 14px;
+        }
+        .location-search-wrap .search-icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8; font-size: 14px; pointer-events: none;
+        }
+        .location-search-wrap input {
+            padding-left: 40px;
+        }
+        .location-search-wrap .locate-btn {
+            position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%);
+            background: var(--forest); color: white;
+            border: none; border-radius: 8px;
+            padding: 5px 10px; font-size: 11px;
+            font-family: 'DM Sans', sans-serif; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 5px;
+            transition: background 0.2s;
+        }
+        .location-search-wrap .locate-btn:hover { background: var(--forest-light); }
+        .location-search-wrap .locate-btn i { font-size: 11px; }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-dropdown {
+            position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 30px -6px rgba(15,59,58,0.12);
+            z-index: 1000;
+            max-height: 200px; overflow-y: auto;
+            display: none;
+        }
+        .autocomplete-dropdown.open { display: block; }
+        .autocomplete-item {
+            padding: 10px 14px; font-size: 13.5px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background: var(--mist); }
+        .autocomplete-item i { color: var(--teal); flex-shrink: 0; font-size: 13px; }
+        .autocomplete-item span { color: var(--slate); font-size: 12px; display: block; }
+        .autocomplete-item .place-name { color: var(--ink); font-weight: 500; font-size: 13.5px; }
+
+        /* Map */
+        .map-container {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            height: 240px;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .map-container:hover { border-color: #a0b8b6; }
+        #map { height: 100%; width: 100%; }
+
+        .map-hint {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(15,59,58,0.85); color: white;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 11.5px; pointer-events: none;
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            white-space: nowrap;
+        }
+
+        /* Selected location chip */
+        .location-chip {
+            display: none; align-items: center; gap: 8px;
+            background: var(--teal-dim); border: 1px solid rgba(45,212,191,0.3);
+            border-radius: 8px; padding: 8px 12px;
+            margin-top: 10px; font-size: 13px;
+        }
+        .location-chip.visible { display: flex; }
+        .location-chip i { color: var(--teal); }
+        .location-chip .chip-text { flex: 1; color: var(--forest); font-weight: 500; }
+        .location-chip .chip-clear {
+            color: var(--slate); cursor: pointer; font-size: 12px;
+            padding: 2px 5px; border-radius: 4px;
+            transition: color 0.15s;
+        }
+        .location-chip .chip-clear:hover { color: var(--error); }
+
+        /* Password */
+        .pass-wrap { position: relative; }
+        .pass-wrap .toggle-pass {
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none; color: #94a3b8;
+            cursor: pointer; padding: 0; font-size: 14px;
+            transition: color 0.2s;
+        }
+        .pass-wrap .toggle-pass:hover { color: var(--forest); }
+
+        /* Strength bar */
+        .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+        .strength-seg { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+        .strength-seg.weak { background: #ef4444; }
+        .strength-seg.medium { background: #f59e0b; }
+        .strength-seg.strong { background: #22c55e; }
+
+        /* Terms */
+        .terms-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-top: 20px;
+        }
+        .terms-row input[type="checkbox"] {
+            width: 18px; height: 18px; flex-shrink: 0;
+            accent-color: var(--forest); cursor: pointer; margin-top: 1px;
+        }
+        .terms-row label { font-size: 13px; color: var(--slate); line-height: 1.5; }
+        .terms-row a { color: var(--forest); font-weight: 600; text-decoration: none; }
+
         .btn-submit {
-            width: 100%; padding: 14px; background: #0f3b3a; color: white;
-            border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
-            cursor: pointer; margin-top: 20px; transition: 0.2s;
+            width: 100%; padding: 14px;
+            background: var(--forest); color: white;
+            border: none; border-radius: var(--radius);
+            font-family: 'Syne', sans-serif;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer; margin-top: 22px;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            letter-spacing: 0.01em;
         }
-        .btn-submit:hover { background: #164e4d; }
-        .error-msg { color: #ef4444; font-size: 13px; margin-top: 5px; }
+        .btn-submit:hover {
+            background: var(--forest-light);
+            box-shadow: 0 8px 24px -6px rgba(15,59,58,0.35);
+            transform: translateY(-1px);
+        }
+        .btn-submit:active { transform: translateY(0); }
+
+        .error-msg {
+            color: var(--error); font-size: 13px;
+            background: #fef2f2; border: 1px solid #fecaca;
+            border-radius: 8px; padding: 10px 14px;
+            margin-bottom: 16px;
+        }
+
         /* Responsive */
-        @media (max-width: 992px) { .register-wrapper { flex-direction: column; } }
-        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+        @media (max-width: 960px) {
+            .brand-side { display: none; }
+            .form-side { padding: 40px 32px; max-height: none; }
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .form-side { padding: 32px 20px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="register-wrapper">
+
+        <!-- Brand Side -->
         <div class="brand-side">
             <div class="brand-logo">
-                <i class="fas fa-briefcase"></i>
+                <div class="logo-icon"><i class="fas fa-briefcase"></i></div>
                 <span>LabourConnect</span>
             </div>
             <div class="brand-tagline">
                 <h2>Hire skilled<br><span>workers today.</span></h2>
+                <p>Post jobs, connect with verified tradespeople, and build your team effortlessly.</p>
             </div>
             <div class="feature-list">
                 <div class="feature-item">
                     <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                    <div><strong>Verified Experts</strong></div>
+                    <div class="feature-text">
+                        <strong>Verified Experts</strong>
+                        <span>Every worker is background-checked</span>
+                    </div>
                 </div>
                 <div class="feature-item">
                     <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-                    <div><strong>Instant Matching</strong></div>
+                    <div class="feature-text">
+                        <strong>Instant Matching</strong>
+                        <span>Get candidates within minutes</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="feature-text">
+                        <strong>Location-Smart</strong>
+                        <span>Hire workers near your site</span>
+                    </div>
+                </div>
+            </div>
+            <div class="brand-footer">
+                <div class="step-dots">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
                 </div>
             </div>
         </div>
 
+        <!-- Form Side -->
         <div class="form-side">
             <div class="form-header">
                 <h1>Join as an Employer</h1>
@@ -112,16 +405,19 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    <p class="error-msg">{{ message }}</p>
+                    <p class="error-msg"><i class="fas fa-exclamation-circle"></i> {{ message }}</p>
                 {% endfor %}
             {% endif %}
 
-            <form action="{% url 'user_register' %}" method="POST">
+            <form action="{% url 'user_register' %}" method="POST" id="registerForm">
                 {% csrf_token %}
+
+                <div class="section-label">Personal Info</div>
+
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label for="full_name">Full Name</label>
-                        <input type="text" name="full_name" id="full_name" class="input-field" placeholder="Rahul Sharma" required>
+                        <input type="text" name="full_name" id="full_name" class="input-field" placeholder="e.g. Rahul Sharma" required>
                     </div>
 
                     <div class="form-group">
@@ -131,46 +427,279 @@
 
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <div class="phone-input-group">
+                        <div class="phone-group">
                             <select name="country_code" class="input-field">
-                                <option value="+91">+91 (IN)</option>
-                                <option value="+1">+1 (US)</option>
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+971">🇦🇪 +971</option>
                             </select>
                             <input type="tel" name="phone" class="input-field" placeholder="98765 43210" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="location">City / Location</label>
-                        <input type="text" name="location" id="location" class="input-field" placeholder="Mumbai, MH" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="company">Company Name (Optional)</label>
+                        <label for="company">Company Name <span style="color:#94a3b8;font-weight:400">(optional)</span></label>
                         <input type="text" name="company" id="company" class="input-field" placeholder="BuildRight Pvt Ltd">
                     </div>
+                </div>
 
+                <!-- Location -->
+                <div class="section-label">Work Location</div>
+
+                <div class="location-section">
+                    <div class="location-search-wrap">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="locationSearch" class="input-field"
+                               placeholder="Search city, area or pin code..."
+                               autocomplete="off">
+                        <button type="button" class="locate-btn" onclick="getMyLocation()">
+                            <i class="fas fa-crosshairs"></i> My Location
+                        </button>
+                        <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                    </div>
+
+                    <div class="map-container">
+                        <div id="map"></div>
+                        <div class="map-hint" id="mapHint">Click on map to pin your location</div>
+                    </div>
+
+                    <div class="location-chip" id="locationChip">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="chip-text" id="chipText">—</span>
+                        <span class="chip-clear" onclick="clearLocation()" title="Remove"><i class="fas fa-times"></i></span>
+                    </div>
+
+                    <!-- Hidden fields sent to Django -->
+                    <input type="hidden" name="location" id="locationValue">
+                    <input type="hidden" name="latitude" id="latValue">
+                    <input type="hidden" name="longitude" id="lngValue">
+                </div>
+
+                <!-- Security -->
+                <div class="section-label">Security</div>
+
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" name="password" id="password" class="input-field" required>
+                        <div class="pass-wrap">
+                            <input type="password" name="password" id="password" class="input-field"
+                                   placeholder="Min. 8 characters" required oninput="checkStrength()">
+                            <button type="button" class="toggle-pass" onclick="togglePass('password', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="strength-bar" id="strengthBar">
+                            <div class="strength-seg" id="s1"></div>
+                            <div class="strength-seg" id="s2"></div>
+                            <div class="strength-seg" id="s3"></div>
+                            <div class="strength-seg" id="s4"></div>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="confirm_password">Confirm Password</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="input-field" required>
+                        <div class="pass-wrap">
+                            <input type="password" name="confirm_password" id="confirm_password"
+                                   class="input-field" placeholder="Repeat password" required>
+                            <button type="button" class="toggle-pass" onclick="togglePass('confirm_password', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 15px;">
+                <div class="terms-row">
                     <input type="checkbox" name="terms" id="terms" required>
-                    <label for="terms" style="font-size: 13px; color: #64748b;">I agree to the Terms & Privacy Policy</label>
+                    <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
                 </div>
 
-                <button type="submit" class="btn-submit">Create My Account</button>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-user-plus"></i>
+                    Create My Account
+                </button>
             </form>
         </div>
     </div>
 </div>
 
+<script>
+    // ─── Map Setup ───────────────────────────────────────────────
+    const map = L.map('map', { zoomControl: true }).setView([20.5937, 78.9629], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Custom marker icon
+    const customIcon = L.divIcon({
+        html: `<div style="
+            background: #0f3b3a;
+            width: 34px; height: 34px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 3px solid #2dd4bf;
+            box-shadow: 0 4px 14px rgba(15,59,58,0.35);
+        "></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        className: ''
+    });
+
+    let marker = null;
+
+    function placeMarker(lat, lng, label) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+        map.setView([lat, lng], 14);
+
+        document.getElementById('locationValue').value = label;
+        document.getElementById('latValue').value = lat;
+        document.getElementById('lngValue').value = lng;
+        document.getElementById('chipText').textContent = label;
+        document.getElementById('locationChip').classList.add('visible');
+        document.getElementById('mapHint').style.opacity = '0';
+    }
+
+    // Click on map to set location
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        reverseGeocode(lat, lng);
+    });
+
+    // ─── Reverse Geocoding (Nominatim) ───────────────────────────
+    async function reverseGeocode(lat, lng) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+            const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+            const data = await res.json();
+            const label = data.display_name
+                ? data.display_name.split(',').slice(0,3).join(', ')
+                : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            placeMarker(lat, lng, label);
+            document.getElementById('locationSearch').value = label;
+        } catch {
+            placeMarker(lat, lng, `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        }
+    }
+
+    // ─── Search / Autocomplete ───────────────────────────────────
+    let searchTimer;
+    const searchInput = document.getElementById('locationSearch');
+    const dropdown = document.getElementById('autocompleteDropdown');
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const q = this.value.trim();
+        if (q.length < 3) { closeDropdown(); return; }
+        searchTimer = setTimeout(() => searchPlaces(q), 350);
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDropdown();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.location-search-wrap')) closeDropdown();
+    });
+
+    async function searchPlaces(query) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&addressdetails=1`;
+            const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+            const results = await res.json();
+            renderDropdown(results);
+        } catch { closeDropdown(); }
+    }
+
+    function renderDropdown(results) {
+        if (!results.length) { closeDropdown(); return; }
+        dropdown.innerHTML = results.map(r => {
+            const parts = r.display_name.split(',');
+            const name = parts.slice(0, 2).join(',').trim();
+            const sub = parts.slice(2, 4).join(',').trim();
+            return `<div class="autocomplete-item" onclick="selectPlace(${r.lat}, ${r.lon}, '${escapeSingle(r.display_name)}')">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <div class="place-name">${name}</div>
+                    <span>${sub}</span>
+                </div>
+            </div>`;
+        }).join('');
+        dropdown.classList.add('open');
+    }
+
+    function selectPlace(lat, lng, label) {
+        const shortLabel = label.split(',').slice(0,3).join(', ');
+        placeMarker(parseFloat(lat), parseFloat(lng), shortLabel);
+        searchInput.value = shortLabel;
+        closeDropdown();
+    }
+
+    function closeDropdown() { dropdown.classList.remove('open'); dropdown.innerHTML = ''; }
+
+    function escapeSingle(str) { return str.replace(/'/g, "\\'"); }
+
+    // ─── GPS / My Location ───────────────────────────────────────
+    function getMyLocation() {
+        if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+        const btn = document.querySelector('.locate-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> My Location';
+                reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+            },
+            () => {
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> My Location';
+                alert('Could not get your location. Please allow location access.');
+            }
+        );
+    }
+
+    // ─── Clear Location ──────────────────────────────────────────
+    function clearLocation() {
+        if (marker) { map.removeLayer(marker); marker = null; }
+        document.getElementById('locationValue').value = '';
+        document.getElementById('latValue').value = '';
+        document.getElementById('lngValue').value = '';
+        document.getElementById('chipText').textContent = '—';
+        document.getElementById('locationChip').classList.remove('visible');
+        searchInput.value = '';
+        document.getElementById('mapHint').style.opacity = '1';
+        map.setView([20.5937, 78.9629], 5);
+    }
+
+    // ─── Password Strength ───────────────────────────────────────
+    function checkStrength() {
+        const pw = document.getElementById('password').value;
+        const segs = ['s1','s2','s3','s4'];
+        segs.forEach(s => { document.getElementById(s).className = 'strength-seg'; });
+        if (!pw) return;
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+        for (let i = 0; i < score; i++) {
+            document.getElementById(segs[i]).classList.add(cls);
+        }
+    }
+
+    // ─── Toggle Password ─────────────────────────────────────────
+    function togglePass(id, btn) {
+        const el = document.getElementById(id);
+        const icon = btn.querySelector('i');
+        if (el.type === 'password') {
+            el.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            el.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+</script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+from enum import unique
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
@@ -27,8 +29,20 @@ class Worker(models.Model):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15)
     password = models.CharField(max_length=128)
-
+    profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)  
     works = models.ManyToManyField(WorkType)
+    STATUS_CHOICES = [
+        
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    ]
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='Active'
+    ) 
 
     introduction = models.TextField(blank=True, null=True)
 

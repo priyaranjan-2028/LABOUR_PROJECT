@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard · Labour Connect</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --transition: all 0.25s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f1f5f9, #e6f0f5);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR (left) ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 4px 0 20px -10px rgba(37, 99, 235, 0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.8rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .logo i {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+
+        .worker-mini-profile {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .worker-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .worker-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .worker-rating {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .sidebar-menu {
+            padding: 1.5rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
+            color: var(--text-gray);
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            text-decoration: none;
+        }
+        .menu-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: var(--primary-light);
+        }
+        .menu-item:hover {
+            background: #eef2ff;
+            color: var(--primary-dark);
+            border-left-color: var(--primary);
+            transform: translateX(5px);
+        }
+        .menu-item.active {
+            background: #eef2ff;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+        .menu-item.active i {
+            color: var(--primary);
+        }
+
+        .sidebar-footer {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* ===== MAIN CONTENT (right side) ===== */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: var(--transition);
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .icon-btn {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .icon-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* ===== DASHBOARD HOME CONTENT ===== */
+        .dashboard-home {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .welcome-hero {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border-radius: 40px;
+            padding: 2.5rem 3rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-lg);
+        }
+        .hero-text h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .hero-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .hero-icon {
+            font-size: 6rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: #eef2ff;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .recent-card {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .activity-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        .activity-time {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+
+        .earnings-card {
+            background: linear-gradient(145deg, #10b981, #059669);
+            border-radius: 32px;
+            padding: 1.8rem;
+            color: white;
+        }
+        .earnings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .earnings-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .chart-placeholder {
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .action-btn {
+            background: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Active link styling */
+        .menu-item.active-link {
+            background: #eef2ff;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+        .menu-item.active-link i {
+            color: var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; }
+            .main-content { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+        
+/* Modal overlay */
+.modal-overlay {
+    display: none; /* hidden by default */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal content */
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Close button */
+.btn-close {
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- SIDEBAR (left) with Django URLs -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <span>Labour Connect</span>
+                </div>
+            </div>
+
+            <div class="worker-mini-profile">
+    <label for="profile-photo-input" style="cursor: pointer;">
+        <img src="{% if worker.profile_photo %}{{ worker.profile_photo.url }}{% else %}https://ui-avatars.com/api/?name={{ worker.name|default:'John+Doe' }}&size=80&background=2563eb&color=fff{% endif %}" 
+             alt="worker" class="worker-avatar" id="worker-avatar">
+    </label>
+    <input type="file" id="profile-photo-input" accept="image/*" style="display: none;">
+    <div class="worker-name">{{ worker.name }}</div>
+    <div class="worker-rating">
+        <i class="fas fa-star"></i> 4.8 · 42 jobs
+    </div>
+</div>
+
+            <nav class="sidebar-menu">
+                <a href="{% url 'app1:dashboard1' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard1' %}active-link{% endif %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                
+                <a href="{% url 'app1:profile' %}" class="menu-item {% if request.resolver_match.url_name == 'profile' %}active-link{% endif %}">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                
+                <a href="{% url 'app1:notification' %}" class="menu-item {% if request.resolver_match.url_name == 'notification' %}active-link{% endif %}">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+                
+                <a href="{% url 'app1:workhistory' %}" class="menu-item {% if request.resolver_match.url_name == 'workhistory' %}active-link{% endif %}">
+                    <i class="fas fa-history"></i> Work History
+                </a>
+                
+              
+                
+                <a href="{% url 'app1:update' %}" class="menu-item {% if request.resolver_match.url_name == 'update' %}active-link{% endif %}">
+                    <i class="fas fa-edit"></i> Update Profile
+                </a>
+                
+                <a href="{% url 'worker_login' %}" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+
+          <!-- Sidebar Footer -->
+<div class="sidebar-footer" id="contactSupportBtn" style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
+    <i class="fas fa-headset"></i> Need help? Contact support
+</div>
+
+<!-- Modal Overlay -->
+<div id="supportModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Contact Support</h3>
+        <p>Our support team is ready to help you!</p>
+        <ul style="list-style:none; padding:0;">
+            <li><strong>Priyaranjan Pani</strong> - +91 8249450148</li>
+            <li><strong>Avijit Patra</strong> - +91 9332664505</li>
+            <li><strong>Nilesh Swain</strong> - +91 9668881471</li>
+        </ul>
+        <button class="btn-close" id="closeModal">Close</button>
+    </div>
+</div>        </aside>
+
+        <!-- MAIN CONTENT (right) -->
+        <main class="main-content">
+       <div class="top-bar" style="position: relative; display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+    <!-- Centered text -->
+            <span style="
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                font-weight: 700;
+                font-size: 1.5rem;
+                color: #db0d0d;
+                    ">
+                    DAILY-LABOUR CONNECT PLATFORM
+            </span>
+
+            <!-- Right side icons -->
+                <a href="{% url 'app1:notification' %}" class="icon-btn"><i class="fas fa-bell"></i></a>
+                <a href="{% url 'app1:profile' %}" class="icon-btn"><i class="fas fa-user-circle"></i></a>
+        </div>
+            <!-- DASHBOARD HOME CONTENT -->
+            <div class="dashboard-home">
+                <div class="welcome-hero">
+                    <div class="hero-text">
+                        <h1>Welcome back, {{worker.name}} 👋</h1>
+                        <p>Your next job is just a click away. Keep up the great work!</p>
+                       <div class="quick-actions">
+    <!-- Track Jobs button -->
+    <a href="{% url 'app1:notification' %}" class="action-btn">
+        <i class="fas fa-clipboard-list"></i> Track Jobs
+    </a>
+
+    <!-- Tips button -->
+    <button class="action-btn" id="tips-btn">
+        <i class="fas fa-lightbulb"></i> Tips
+    </button>
+</div>
+
+<!-- Hidden tips form/modal -->
+<div id="tips-form" style="display:none; background:white; padding:1.5rem; border-radius:16px; margin-top:1rem; box-shadow:0 4px 20px rgba(0,0,0,0.1); color: #1e293b;">
+    <h4 style="margin-bottom: 0.8rem;">Daily Tips for Workers</h4>
+    <p style="line-height: 1.6;">
+        💡 Arrive early to jobs for better ratings.<br>
+        💡 Keep your tools ready.<br>
+        💡 Communicate clearly with clients.<br>
+        💡 Check safety measures before starting work.<br>
+        💡 Update job status promptly.
+    </p>
+    <button class="action-btn" id="close-tips" style="margin-top:0.5rem; background:#ef4444; color:white;"><i class="fas fa-times"></i> Close</button>
+</div>
+                    </div>
+                    <div class="hero-icon">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                            <span class="stat-value">42</span>
+                        </div>
+                        <div class="stat-label">Jobs Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <span class="stat-value">3</span>
+                        </div>
+                        <div class="stat-label">Pending Jobs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                            <span class="stat-value">₹12.5k</span>
+                        </div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <span class="stat-value">4.8</span>
+                        </div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="recent-card">
+                        <h3 class="card-title"><i class="fas fa-history" style="color: #2563eb;"></i> Recent Activity</h3>
+                        <div class="activity-item">
+                            <div class="activity-dot" style="background: #10b981;"></div>
+                            <div class="activity-content">
+                                <h4>Job completed - Plumbing</h4>
+                                <div class="activity-time">2 hours ago · ₹750</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot" style="background: #f59e0b;"></div>
+                            <div class="activity-content">
+                                <h4>New job assigned - Painting</h4>
+                                <div class="activity-time">Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot" style="background: #2563eb;"></div>
+                            <div class="activity-content">
+                                <h4>Profile updated</h4>
+                                <div class="activity-time">3 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="earnings-card">
+                        <div class="earnings-header">
+                            <span>Monthly Earnings</span>
+                            <i class="fas fa-chart-line" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div class="earnings-amount">₹4,850</div>
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-simple"></i> ↑ 12% from last month
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span>Completion rate: 94%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; background: white; border-radius: 28px; padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-calendar-check" style="font-size: 2rem; color: #f59e0b;"></i>
+                    <span><strong>Next job:</strong> Electrical wiring · Tomorrow 10:00 AM · Andheri East</span>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Add this somewhere in your body, it can be hidden -->
+<form style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+const profilePhotoInput = document.getElementById('profile-photo-input');
+const workerAvatar = document.getElementById('worker-avatar');
+
+profilePhotoInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+    
+    // CSRF token for Django
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch("{% url 'app1:ajax_upload_photo' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the image preview immediately
+            workerAvatar.src = data.photo_url;
+        } else {
+            alert(data.error || "Upload failed");
+        }
+    })
+    .catch(error => {
+        console.error("Error uploading image:", error);
+    });
+});
+    const tipsBtn = document.getElementById('tips-btn');
+    const tipsForm = document.getElementById('tips-form');
+    const closeTips = document.getElementById('close-tips');
+
+    tipsBtn.addEventListener('click', () => {
+        tipsForm.style.display = 'block';
+        tipsForm.scrollIntoView({behavior: "smooth"});
+    });
+
+    closeTips.addEventListener('click', () => {
+        tipsForm.style.display = 'none';
+    });
+
+
+    const modal = document.getElementById('supportModal');
+const openBtn = document.getElementById('contactSupportBtn');
+const closeBtn = document.getElementById('closeModal');
+
+// Open modal on click
+openBtn.addEventListener('click', () => {
+    modal.style.display = 'flex';
+});
+
+// Close modal on button click
+closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
+
+// Close modal if user clicks outside content
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+</script>
+</body>
+</html>

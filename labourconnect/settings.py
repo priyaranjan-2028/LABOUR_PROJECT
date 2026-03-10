@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts",
-     'rest_framework',
+    "app1",
+    "user",
+   
     
     
 ]
@@ -60,7 +62,9 @@ ROOT_URLCONF = "labourconnect.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [os.path.join(BASE_DIR, 'templates'),
+                   
+                 ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -145,3 +149,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'priyaranjanpani82@gmail.com'
 EMAIL_HOST_PASSWORD = 'wmzmljpuwyvevmde'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

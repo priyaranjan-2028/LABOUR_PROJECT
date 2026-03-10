@@ -98,7 +98,7 @@
         /* Login Button */
         .login-btn {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            color: yellow;
             border: none;
             padding: 0.8rem 1.8rem;
             border-radius: 50px;
@@ -108,7 +108,7 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(22, 96, 136, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.25);
         }
 
         .login-btn:hover {
@@ -591,8 +591,8 @@
             <h1>Connecting <span>Skilled Labour</span> with Opportunities Daily</h1>
             <p>Find daily work opportunities or hire reliable labour for your projects. Our platform connects thousands of skilled workers with employers in real-time.</p>
             <div class="cta-buttons">
-                    <a href="{% url 'worker_register' %}"class="btn btn-primary">Find Work</a>
-                    <a href="{% url 'user_register' %}"class="btn btn-secondary">Hire Labour</a>
+                    <a href="{% url 'worker_login' %}"class="btn btn-primary">Find Work</a>
+                    <a href="{% url 'user_login' %}"class="btn btn-secondary">Hire Labour</a>
 
 
             </div>

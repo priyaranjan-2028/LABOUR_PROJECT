@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worker Profile - Labour Connect</title>
+
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* ==================== GLOBAL STYLES ==================== */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; padding:2rem; }
+
+    :root {
+        --primary-color: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --bg-white: #ffffff;
+        --text-gray: #64748b;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        --shadow-lg: 0 0 20px rgba(0,0,0,0.15);
+    }
+
+    .container { max-width:900px; margin:0 auto; }
+    .card { background: var(--bg-white); border-radius: 24px; padding:2rem; box-shadow: var(--shadow-lg); border:1px solid #e2e8f0; margin-bottom:2rem; }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; border-bottom:2px solid #f8fafc; padding-bottom:1rem; }
+    .card-title { font-size:2rem; font-weight:700; color: var(--primary-color); display:flex; align-items:center; gap:0.5rem; }
+    .btn { padding:0.7rem 1.5rem; border:none; border-radius:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.6rem; transition:all 0.3s ease; text-decoration:none; }
+    .btn-primary { background: var(--primary-color); color:white; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    /* Profile Image */
+    .profile-image-wrapper { text-align:center; margin-bottom:2rem; position:relative; }
+    .profile-image { width:180px; height:180px; border-radius:50%; object-fit:cover; border:5px solid var(--primary-color); box-shadow: var(--shadow-md); transition: transform 0.3s ease; }
+    .profile-image:hover { transform: scale(1.05); }
+    .status-badge { position:absolute; bottom:10px; right:10px; padding:0.4rem 0.8rem; border-radius:20px; font-size:0.85rem; font-weight:600; color:white; display:flex; align-items:center; gap:0.4rem; }
+    .status-active { background-color: var(--secondary-color); }
+    .status-inactive { background-color: var(--danger-color); }
+
+    /* Profile Details Grid */
+    .profile-details-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:1.5rem; margin-top:2rem; }
+    .detail-card { background: #f8fafc; border-radius:18px; padding:1.2rem; border:1px solid #e2e8f0; transition: all 0.3s ease; }
+    .detail-card:hover { transform:translateY(-3px); background:white; box-shadow: var(--shadow-md); }
+    .detail-icon { font-size:1.5rem; color: var(--primary-color); margin-bottom:0.6rem; }
+    .detail-label { font-size:0.85rem; color: var(--text-gray); text-transform:uppercase; margin-bottom:0.3rem; letter-spacing:0.5px; }
+    .detail-value { font-size:1.1rem; font-weight:600; color: #1e293b; word-break: break-word; }
+    .skills-tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem; }
+    .skill-tag { background: var(--primary-color); color:white; padding:0.4rem 0.9rem; border-radius:20px; font-size:0.85rem; font-weight:500; transition: all 0.2s ease; }
+    .skill-tag:hover { background: var(--primary-dark); transform:scale(1.05); }
+    .rating-stars { color: var(--warning-color); font-size:1rem; }
+    .detail-card-full {
+    grid-column: span 2; /* full width */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers the content horizontally */
+    justify-content: center;
+    text-align: center;
+}
+.skills-tags {
+    justify-content: center; /* centers the skill tags */
+}
+
+    /* Additional Info */
+    .additional-info { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; margin-top:2rem; }
+    .info-box { text-align:center; }
+    .info-box .value { font-size:1.5rem; font-weight:700; margin-bottom:0.3rem; }
+    .info-box .label { font-size:0.9rem; color:var(--text-gray); }
+
+    /* ==================== Tips Card ==================== */
+    #tips-form { display:none; max-width:600px; margin:2rem auto; background: linear-gradient(145deg, #ffffff, #f0f4f8); padding:2rem; border-radius:24px; box-shadow:0 10px 25px rgba(0,0,0,0.15); color:#1e293b; }
+    #tips-form h4 { font-size:1.5rem; font-weight:700; margin-bottom:1rem; color: var(--primary-color); display:flex; align-items:center; gap:0.5rem; }
+    #tips-form ul { list-style:none; padding-left:0; line-height:1.7; }
+    #tips-form li { margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem; }
+    #tips-form button#close-tips { background:#ef4444; color:white; border:none; border-radius:12px; padding:0.4rem 0.8rem; cursor:pointer; font-weight:600; float:right; }
+
+    /* Responsive */
+    @media (max-width:768px){
+        .profile-details-grid { grid-template-columns:1fr; }
+        .additional-info { flex-direction:column; gap:1rem; }
+    }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Profile Card -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-user"></i> Worker Profile
+            </h2>
+            <a href="{% url 'app1:update' %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Profile
+            </a>
+        </div>
+
+        <!-- Profile Image -->
+        <div class="profile-image-wrapper">
+            {% if worker.profile_photo %}
+                <img src="{{ worker.profile_photo.url }}" class="profile-image">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ worker.full_name|default:'John+Doe' }}&size=180&background=2563eb&color=fff" class="profile-image">
+            {% endif %}
+
+            {% if worker.status == 'active' %}
+            <span class="status-badge status-active"><i class="fas fa-circle" style="font-size:0.6rem;"></i> Active</span>
+            {% else %}
+            <span class="status-badge status-inactive"><i class="fas fa-circle" style="font-size:0.6rem;"></i> Inactive</span>
+            {% endif %}
+        </div>
+
+        <!-- Profile Details Grid -->
+        <div class="profile-details-grid">
+            <div class="detail-card">
+                <div class="detail-icon"><i class="fas fa-user-circle"></i></div>
+                <div class="detail-label">Full Name</div>
+                <div class="detail-value">{{ worker.name|default:"John Doe" }}</div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-icon"><i class="fas fa-envelope"></i></div>
+                <div class="detail-label">Email</div>
+                <div class="detail-value">{{ worker.email|default:"john.doe@example.com" }}</div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-icon"><i class="fas fa-phone-alt"></i></div>
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">{{ worker.phone|default:"+91 98765 43210" }}</div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="detail-label">Location</div>
+                <div class="detail-value">{{ worker.location|default:"Mumbai, Maharashtra" }}</div>
+            </div>
+            <div class="detail-card detail-card-full">
+                <div class="detail-icon"><i class="fas fa-briefcase"></i></div>
+                <div class="detail-label">Skills</div>
+                <div class="skills-tags">
+                    {% for skill in worker.works.all %}
+                        <span class="skill-tag">{{ skill.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="additional-info">
+            <div class="info-box">
+                <div class="value">{{ worker.hourly_rate|default:"₹500" }}</div>
+                <div class="label">Hourly Rate</div>
+            </div>
+            <div class="info-box">
+                <div class="value">{{ worker.completion_rate|default:"98" }}%</div>
+                <div class="label">Completion Rate</div>
+            </div>
+            <div class="info-box">
+                <div class="value">{{ worker.response_time|default:"< 1" }} hr</div>
+                <div class="label">Avg Response Time</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-top:2rem; text-align:center;">
+            <button class="btn btn-primary tips-btn"><i class="fas fa-lightbulb"></i> Tips</button>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div id="tips-form">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4><i class="fas fa-lightbulb" style="color:#f59e0b;"></i> Daily Tips for Workers</h4>
+            <button id="close-tips"><i class="fas fa-times"></i> Close</button>
+        </div>
+        <ul>
+            <li><i class="fas fa-check-circle" style="color:#10b981;"></i> Arrive early to jobs for better ratings.</li>
+            <li><i class="fas fa-check-circle" style="color:#10b981;"></i> Keep your tools ready.</li>
+            <li><i class="fas fa-check-circle" style="color:#10b981;"></i> Communicate clearly with clients.</li>
+            <li><i class="fas fa-check-circle" style="color:#10b981;"></i> Check safety measures before starting work.</li>
+            <li><i class="fas fa-check-circle" style="color:#10b981;"></i> Update job status promptly.</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    // Open Tips
+    document.querySelector('.tips-btn').addEventListener('click', function() {
+        document.getElementById('tips-form').style.display = 'block';
+        window.scrollTo({ top: document.getElementById('tips-form').offsetTop - 20, behavior: 'smooth' });
+    });
+
+    // Close Tips
+    document.getElementById('close-tips').addEventListener('click', function() {
+        document.getElementById('tips-form').style.display = 'none';
+    });
+</script>
+</body>
+</html>
